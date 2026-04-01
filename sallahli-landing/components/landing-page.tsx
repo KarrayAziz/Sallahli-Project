@@ -540,11 +540,11 @@ export default function LandingPage() {
             <div className="absolute inset-0 opacity-10"
               style={{ backgroundImage: `radial-gradient(circle at 80% 20%, ${CREAM} 1px, transparent 1px), radial-gradient(circle at 20% 70%, ${CREAM} 1px, transparent 1px)`, backgroundSize: "40px 40px" }} />
             <div className="relative px-10 py-14 text-center">
-              <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 text-[${CREAM}] text-sm font-medium font-sans`} style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 text-sm font-medium font-sans" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: CREAM }}>
                 <Zap className="w-3.5 h-3.5" />
                 30 jours gratuits — aucune carte requise
               </div>
-              <h2 className={`text-4xl md:text-5xl font-bold text-[${CREAM}] mb-4 leading-tight font-serif`}>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-tight font-serif" style={{ color: CREAM }}>
                 Prêt à récupérer<br />votre temps libre ?
               </h2>
               <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto font-sans">
