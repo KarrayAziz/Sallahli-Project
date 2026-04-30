@@ -1,0 +1,124 @@
+import os
+import json
+from dotenv import load_dotenv
+from google import genai
+from google.genai import errors as genai_errors
+
+# 1. Setup Environment
+load_dotenv()
+api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    raise ValueError("GEMINI_API_KEY not found. Please check your .env file.")
+
+client = genai.Client(api_key=api_key)
+
+PRIMARY_MODEL = 'gemini-3-flash-preview'
+FALLBACK_MODEL = 'gemini-2.5-flash'
+
+def parse_rubric_pdf(pdf_path, output_json_path):
+    print(f"Uploading official rubric PDF: {pdf_path}...")
+    
+    # 2. Upload the PDF to Gemini
+    with open(pdf_path, "rb") as f:
+        rubric_file = client.files.upload(
+            file=f,
+            config={'mime_type': 'application/pdf'}
+        )
+    
+    # 3. The Strict JSON Prompt
+    prompt = """
+    Tu es un assistant d'extraction de données strict. Ton SEUL rôle est de copier-coller et de structurer le texte exact du corrigé PDF fourni. 
+    TU NE DOIS JAMAIS reformuler, résumer, interpréter ou inventer des réponses modèles. Tu dois utiliser les mots exacts du document.
+
+    Pour CHAQUE question trouvée dans le document, extrais :
+    1. "question_id" : L'identifiant de la question. 
+       - RÈGLE ABSOLUE : L'identifiant DOIT inclure le numéro de l'exercice. Format obligatoire : "Ex[Numéro Exercice]_Q[Numéro/Lettre Question]". 
+       - Exemples : "Ex1_Q1", "Ex1_Q3.a", "Ex2_Q1", "Ex3_QII.1".
+    2. "context" : Le texte d'introduction global de l'exercice (description du dataset, liste des variables, etc.). 
+       - RÈGLE ABSOLUE : Ce champ NE DOIT PAS être null si l'exercice possède une introduction. Tu DOIS copier et répéter l'introduction complète de l'exercice pour TOUTES les questions qui appartiennent à cet exercice. (Exemple: Pour les questions 1, 2, et 3, tu dois coller la description complète du jeu de données dans le context de CHACUNE de ces questions).
+       - RÈGLE POUR LES TABLEAUX : Si le contexte contient un tableau, tu DOIS obligatoirement le formater en Markdown (avec les symboles `|` et `-`).
+    3. "question_text" : UNIQUEMENT la phrase de la question exacte qui a été posée à l'étudiant. 
+       - RÈGLE POUR LES SOUS-QUESTIONS : Si c'est une sous-question (ex: 3.a, 3.b), tu DOIS concaténer le texte de la question parente avec le texte de la sous-question.
+    4. "max_score" : Le score total de la question (float).
+    5. "criteria" : Un tableau d'objets définissant le barème détaillé. 
+       - RÈGLE ABSOLUE DE SÉPARATION : Tu DOIS obligatoirement séparer le texte de la condition et la valeur des points en DEUX clés distinctes : "condition" (string) et "points" (float).
+       - RÈGLE POUR LES LISTES À PUCES ET BLOCS GLOBAUX : Si le corrigé indique un score global (ex: "1 pt") suivi de plusieurs tirets, puces, formules mathématiques ou explications SANS points spécifiques pour chaque ligne, tu DOIS regrouper TOUT ce texte en UNE SEULE "condition" valant ce score global. 
+       - RÈGLE ANTI-INVENTION (CRITIQUE) : NE DIVISE JAMAIS les points toi-même. N'invente JAMAIS des scores comme 0.33, 0.34 ou 0.0. Si les points partiels ne sont pas explicitement écrits dans le texte, regroupe tout sous le score global.
+       - RÈGLE D'EXHAUSTIVITÉ (SAUTS DE PAGE) : Une correction peut s'étaler sur plusieurs paragraphes ou traverser un saut de page (ex: de la page 4 à la page 5). Tu DOIS capturer l'intégralité de la correction (incluant toutes les formules de covariance, variance, etc.) jusqu'à ce que tu rencontres la question suivante. Ne tronque pas la réponse.
+       - Le texte des points (ex: "0.25 pt", "1 pt") NE DOIT JAMAIS être inclus dans la chaîne "condition".
+       - ATTENTION AUX FUSIONS DE TEXTE : Si le texte dit "nbre d'occurrences 4 0.25 pt", la condition est "...nbre d'occurrences 4" et les points sont 0.25. Ne fusionne jamais les chiffres pour créer des aberrations comme "40.25".
+       - RÈGLE D'EXCLUSION : Ne crée un critère QUE s'il y a des points associés. S'il y a une phrase d'introduction sans points (ex: "En considérant l'histogramme :"), intègre-la au critère suivant ou ignore-la. 
+
+    Voici la structure EXACTE requise pour les critères :
+    "criteria": [
+        {
+            "condition": "La largeur commune des bins est 50-10/N=8 => on aura 5 bins",
+            "points": 0.25
+        },
+        {
+            "condition": "[10 - 18[ (10, 13, 14, 15) => nbre d'occurrences 4",
+            "points": 0.25
+        }
+    ]
+    RENVOIE UNIQUEMENT UN TABLEAU JSON VALIDE.
+    """
+
+    # 4. Generate the Structured Content with fallback
+    model_config = {
+        "response_mime_type": "application/json",
+        "temperature": 0.1  # Keep it strict, deterministic, and factual
+    }
+
+    try:
+        print(f"Parsing rubric with {PRIMARY_MODEL} (This may take 30-60 seconds)...")
+        response = client.models.generate_content(
+            model=PRIMARY_MODEL,
+            contents=[rubric_file, prompt],
+            config=model_config
+        )
+    except genai_errors.ServerError as e:
+        if "503" in str(e) or "UNAVAILABLE" in str(e):
+            print(f"    {PRIMARY_MODEL} unavailable. Falling back to {FALLBACK_MODEL}...")
+            response = client.models.generate_content(
+                model=FALLBACK_MODEL,
+                contents=[rubric_file, prompt],
+                config=model_config
+            )
+        else:
+            raise
+
+    # 5. Clean up the response and save it
+    try:
+        parsed_json = json.loads(response.text)
+        
+        with open(output_json_path, 'w', encoding='utf-8') as f:
+            json.dump(parsed_json, f, indent=4, ensure_ascii=False)
+            
+        print(f"\n✅ Success! Structured rubric saved locally to {output_json_path}")
+        print(f"Total questions parsed: {len(parsed_json)}")
+        
+    except json.JSONDecodeError:
+        print("❌ Error: Gemini did not return valid JSON. Here is the raw output:")
+        print(response.text)
+        
+    finally:
+        # Always clean up the file from Google's servers to protect student/exam data
+        print("Cleaning up file from cloud...")
+        client.files.delete(name=rubric_file.name)
+
+# --- EXECUTE ---
+if __name__ == "__main__":
+    # Point this to where your Corrigé PDF actually lives on your PC
+    PDF_INPUT_PATH = "Correction\\Corrigé_ingénierie_données_2025.pdf"
+    JSON_OUTPUT_PATH = "master_rubric.json"
+    
+    # Create the exam_papers folder if it doesn't exist to prevent errors
+    if not os.path.exists("exam_papers"):
+        print("Creating 'exam_papers' folder. Please place your PDF inside it and run again.")
+        os.makedirs("exam_papers")
+    elif not os.path.exists(PDF_INPUT_PATH):
+        print(f"File not found: {PDF_INPUT_PATH}. Please make sure the PDF is in the correct folder.")
+    else:
+        parse_rubric_pdf(PDF_INPUT_PATH, JSON_OUTPUT_PATH)
+        
