@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { Pricing } from "@/components/pricing";
@@ -199,6 +200,7 @@ const GridItem = ({ area, icon, title, description }: GridItemProps) => {
 
 /* ─── Component ────────────────────────────────────────────── */
 export default function LandingPage() {
+  const router = useRouter();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -261,6 +263,7 @@ export default function LandingPage() {
             <SkyToggle />
             <InteractiveHoverButton
               text="Commencer"
+              onClick={() => router.push('/fr/grades')}
               className="hidden md:flex h-9 text-sm rounded-xl border-0 shadow-md"
             />
           </div>
@@ -308,6 +311,7 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center fade-up delay-3">
           <InteractiveHoverButton
             text="Essayer gratuitement"
+            onClick={() => router.push('/fr/grades')}
             className="h-12 w-full sm:w-auto text-base rounded-xl shadow-lg"
           />
           <Button
@@ -554,6 +558,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <InteractiveHoverButton
                   text="Commencer maintenant"
+                  onClick={() => router.push('/fr/grades')}
                   className="h-12 w-full sm:w-auto text-base rounded-xl shadow-lg border-0 bg-transparent text-white"
                 />
               </div>

@@ -14,21 +14,8 @@ STUDENT_ANSWERS_PATH = os.path.join(BASE_DIR, 'student_answers.json')
 OUTPUT_GRADES_PATH = os.path.join(BASE_DIR, 'graded_results_gemini.json')
 
 # --- 2. CHARGEMENT DES DONNÉES ---
-print("📁 Chargement des fichiers locaux...")
+# Moved to __main__ block to prevent crash on import
 
-try:
-    with open(RUBRIC_PATH, 'r', encoding='utf-8') as f:
-        master_rubric = json.load(f)
-    print(f"✅ Rubric loaded successfully! ({len(master_rubric)} questions)")
-
-    with open(STUDENT_ANSWERS_PATH, 'r', encoding='utf-8') as f:
-        student_answers = json.load(f)
-    print(f"✅ Student Answers loaded successfully! ({len(student_answers)} answers)")
-
-except FileNotFoundError as e:
-    print(f"❌ ERREUR : Fichier introuvable. Fichier manquant : {e.filename}")
-    # Dans un script classique, il est souvent bon de stopper l'exécution si les données manquent
-    exit(1)
 
 
 # --- 3. CONFIGURATION DE L'API VERTEX AI ---
@@ -111,72 +98,176 @@ RÉPONSE DE L'ÉTUDIANT : "{student_answer}"
 
     return response.text
 
-# --- 5. EXÉCUTION DE LA CORRECTION ---
-
-final_grades = {}
-note_globale = 0.0
-
-print(f"\n🚀 DÉMARRAGE DE LA CORRECTION AUTOMATIQUE ({len(master_rubric)} questions)")
-print("-" * 50)
-start_time = time.time()
-
-for rubric_item in master_rubric:
-    q_id = rubric_item.get("question_id")
-    max_score = rubric_item.get("max_score", 0)
+# --- API-friendly function (for FastAPI server) ---
+def grade_exam(master_rubric, student_answers, progress_callback=None):
+    """
+    Grades a full exam given a rubric and student answers.
     
-    if q_id in student_answers:
-        print(f"📡 Évaluation de la question {q_id}...")
-        student_ans = student_answers[q_id]
+    Args:
+        master_rubric: List of rubric question dicts.
+        student_answers: Dict mapping question_id -> student answer text.
+        progress_callback: Optional callable(question_id, score, max_score, index, total)
+            for real-time progress reporting.
         
-        try:
-            # 1. Appel API pour la question spécifique
-            grade_result_str = grade_question_gemini(student_ans, rubric_item)
-            evaluation = json.loads(grade_result_str)
+    Returns:
+        dict: Full grading results including per-question evaluations and BILAN_GLOBAL.
+    """
+    final_grades = {}
+    note_globale = 0.0
+    total_questions = len(master_rubric)
+    
+    print(f"\n🚀 STARTING AI GRADING ({total_questions} questions)")
+    print("-" * 50)
+    
+    for i, rubric_item in enumerate(master_rubric):
+        q_id = rubric_item.get("question_id")
+        max_score = rubric_item.get("max_score", 0)
+        
+        if q_id in student_answers:
+            print(f"📡 Grading question {q_id} ({i+1}/{total_questions})...")
+            student_ans = student_answers[q_id]
             
-            # 2. Sécurisation et extraction du score
             try:
-                score_obtenu = float(evaluation.get("score_final", 0.0))
-            except (ValueError, TypeError):
-                score_obtenu = 0.0 
+                grade_result_str = grade_question_gemini(student_ans, rubric_item)
+                evaluation = json.loads(grade_result_str)
                 
-            # 3. Ajout au cumulatif de la note
-            note_globale += score_obtenu
-            
-            # 4. Enregistrement dans le dictionnaire
-            final_grades[q_id] = {
-                "student_answer": student_ans,
-                "ai_evaluation": evaluation
-            }
-            
-            print(f"   ✅ {q_id} corrigé ! Note : {score_obtenu} / {max_score}")
-
-            # Pause pour respecter les quotas Vertex AI
-            time.sleep(1)
-
-        except Exception as e:
-            print(f"   ❌ Erreur lors de la correction de {q_id} : {e}")
-            final_grades[q_id] = {"erreur": str(e)}
-
-# --- 6. BILAN ET SAUVEGARDE ---
-
-# Calcul final sur 20 (ajustable si le total max n'est pas 20)
-final_grades["BILAN_GLOBAL"] = {
-    "total_points": round(note_globale, 2),
-    "note_sur_20": f"{round(note_globale, 2)}/20",
-    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
-}
-
-end_time = time.time()
-
-# Sauvegarde locale (dans le dossier data configuré en section 1)
-try:
-    with open(OUTPUT_GRADES_PATH, 'w', encoding='utf-8') as f:
-        json.dump(final_grades, f, indent=4, ensure_ascii=False)
+                try:
+                    score_obtenu = float(evaluation.get("score_final", 0.0))
+                except (ValueError, TypeError):
+                    score_obtenu = 0.0
+                
+                note_globale += score_obtenu
+                
+                final_grades[q_id] = {
+                    "student_answer": student_ans,
+                    "ai_evaluation": evaluation,
+                    "max_score": max_score
+                }
+                
+                print(f"   ✅ {q_id} graded! Score: {score_obtenu} / {max_score}")
+                
+                if progress_callback:
+                    progress_callback(q_id, score_obtenu, max_score, i + 1, total_questions)
+                
+                time.sleep(1)
+                
+            except Exception as e:
+                print(f"   ❌ Error grading {q_id}: {e}")
+                final_grades[q_id] = {
+                    "student_answer": student_ans,
+                    "ai_evaluation": {
+                        "raisonnement": f"Erreur lors de la correction: {str(e)}",
+                        "score_final": 0.0,
+                        "justification": "Une erreur technique est survenue."
+                    },
+                    "max_score": max_score,
+                    "erreur": str(e)
+                }
+    
+    # Calculate the total max possible score
+    total_max = sum(item.get("max_score", 0) for item in master_rubric)
+    # Scale to /20 if needed
+    if total_max > 0 and total_max != 20:
+        note_sur_20 = round((note_globale / total_max) * 20, 2)
+    else:
+        note_sur_20 = round(note_globale, 2)
+    
+    final_grades["BILAN_GLOBAL"] = {
+        "total_points": round(note_globale, 2),
+        "total_max": round(total_max, 2),
+        "note_sur_20": f"{note_sur_20}/20",
+        "message": "Somme automatique de tous les scores partiels calculés par l'IA.",
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+    }
     
     print("-" * 50)
-    print(f"\n🎉 Correction terminée en {round(end_time - start_time, 2)} secondes !")
-    print(f"🎓 NOTE FINALE DE L'ÉTUDIANT : {round(note_globale, 2)} / 20")
-    print(f"📁 Résultats sauvegardés dans : {OUTPUT_GRADES_PATH}")
+    print(f"🎓 FINAL SCORE: {round(note_globale, 2)} / {round(total_max, 2)} ({note_sur_20}/20)")
+    
+    return final_grades
 
-except Exception as e:
-    print(f"❌ Erreur lors de la sauvegarde du fichier : {e}")
+
+# --- 5. EXÉCUTION DE LA CORRECTION ---
+
+if __name__ == "__main__":
+    print("📁 Chargement des fichiers locaux...")
+
+    try:
+        with open(RUBRIC_PATH, 'r', encoding='utf-8') as f:
+            master_rubric = json.load(f)
+        print(f"✅ Rubric loaded successfully! ({len(master_rubric)} questions)")
+
+        with open(STUDENT_ANSWERS_PATH, 'r', encoding='utf-8') as f:
+            student_answers = json.load(f)
+        print(f"✅ Student Answers loaded successfully! ({len(student_answers)} answers)")
+
+    except FileNotFoundError as e:
+        print(f"❌ ERREUR : Fichier introuvable. Fichier manquant : {e.filename}")
+        exit(1)
+
+    final_grades = {}
+    note_globale = 0.0
+    
+    print(f"\n🚀 DÉMARRAGE DE LA CORRECTION AUTOMATIQUE ({len(master_rubric)} questions)")
+    print("-" * 50)
+    start_time = time.time()
+    
+    for rubric_item in master_rubric:
+        q_id = rubric_item.get("question_id")
+        max_score = rubric_item.get("max_score", 0)
+        
+        if q_id in student_answers:
+            print(f"📡 Évaluation de la question {q_id}...")
+            student_ans = student_answers[q_id]
+            
+            try:
+                # 1. Appel API pour la question spécifique
+                grade_result_str = grade_question_gemini(student_ans, rubric_item)
+                evaluation = json.loads(grade_result_str)
+                
+                # 2. Sécurisation et extraction du score
+                try:
+                    score_obtenu = float(evaluation.get("score_final", 0.0))
+                except (ValueError, TypeError):
+                    score_obtenu = 0.0 
+                    
+                # 3. Ajout au cumulatif de la note
+                note_globale += score_obtenu
+                
+                # 4. Enregistrement dans le dictionnaire
+                final_grades[q_id] = {
+                    "student_answer": student_ans,
+                    "ai_evaluation": evaluation
+                }
+                
+                print(f"   ✅ {q_id} corrigé ! Note : {score_obtenu} / {max_score}")
+    
+                # Pause pour respecter les quotas Vertex AI
+                time.sleep(1)
+    
+            except Exception as e:
+                print(f"   ❌ Erreur lors de la correction de {q_id} : {e}")
+                final_grades[q_id] = {"erreur": str(e)}
+    
+    # --- 6. BILAN ET SAUVEGARDE ---
+    
+    # Calcul final sur 20 (ajustable si le total max n'est pas 20)
+    final_grades["BILAN_GLOBAL"] = {
+        "total_points": round(note_globale, 2),
+        "note_sur_20": f"{round(note_globale, 2)}/20",
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+    }
+    
+    end_time = time.time()
+    
+    # Sauvegarde locale (dans le dossier data configuré en section 1)
+    try:
+        with open(OUTPUT_GRADES_PATH, 'w', encoding='utf-8') as f:
+            json.dump(final_grades, f, indent=4, ensure_ascii=False)
+        
+        print("-" * 50)
+        print(f"\n🎉 Correction terminée en {round(end_time - start_time, 2)} secondes !")
+        print(f"🎓 NOTE FINALE DE L'ÉTUDIANT : {round(note_globale, 2)} / 20")
+        print(f"📁 Résultats sauvegardés dans : {OUTPUT_GRADES_PATH}")
+
+    except Exception as e:
+        print(f"❌ Erreur lors de la sauvegarde du fichier : {e}")

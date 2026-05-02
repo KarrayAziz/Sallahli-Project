@@ -281,6 +281,60 @@ def save_to_pdf(latex_content, output_filename):
         log_and_print("  xelatex not found. Make sure your LaTeX distribution is up to date.", is_error=True)
 
 
+# --- Single-File Processing (for API use) ---
+def transcribe_single_pdf(pdf_path, statement_text="", temp_dir=None):
+    """
+    Transcribes a single handwritten exam PDF and returns the raw text.
+    This is the API-friendly version — no LaTeX/PDF generation.
+    
+    Args:
+        pdf_path: Path to the student's handwritten exam PDF.
+        statement_text: Optional extracted exam statement text for context.
+        temp_dir: Optional temp directory for intermediate images.
+        
+    Returns:
+        str: The full raw transcription text.
+    """
+    import tempfile
+    
+    if temp_dir is None:
+        temp_dir = tempfile.mkdtemp(prefix="sallahli_ocr_")
+    
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    log_and_print(f"📄 Transcribing single PDF: {os.path.basename(pdf_path)}")
+    
+    # Step 1: Convert PDF to images
+    page_paths = pdf_to_images(pdf_path, output_folder=temp_dir)
+    
+    # Step 2: Build the correct reading order
+    ordered_images = build_transcription_order(page_paths, output_folder=temp_dir)
+    
+    # Step 3: Transcribe each image
+    log_and_print("  Starting transcription...")
+    full_text = ""
+    consecutive_blank_pages = 0
+    
+    for j, img_path in enumerate(ordered_images, 1):
+        log_and_print(f"    Transcribing image {j}/{len(ordered_images)}: {os.path.basename(img_path)}")
+        segment_text = get_transcription(img_path, statement_text)
+        
+        if not segment_text or segment_text.upper() == "NULL":
+            consecutive_blank_pages += 1
+            log_and_print(f"      -> Blank page detected! ({consecutive_blank_pages}/2 consecutive)")
+            
+            if consecutive_blank_pages >= 2:
+                log_and_print(f"      -> 2 consecutive blank pages detected! Stopping.")
+                break
+            continue
+        
+        consecutive_blank_pages = 0
+        full_text += segment_text + "\n\n"
+    
+    log_and_print(f"  ✅ Transcription complete. Total length: {len(full_text)} chars.")
+    return full_text.strip()
+
+
 # 2. Batch Execution Loop
 def process_folder(input_folder, output_folder, temp_images_base, statement_text=""):
     os.makedirs(output_folder, exist_ok=True)
