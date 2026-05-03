@@ -19,6 +19,13 @@ export interface BilanGlobal {
   timestamp?: string;
 }
 
+export interface TranscriptionDocument {
+  filename: string;
+  mime_type: string;
+  pdf_base64?: string | null;
+  raw_text: string;
+}
+
 export interface GradesData {
   [key: string]: GradeResult;
 }

@@ -10,6 +10,7 @@ import time
 import shutil
 import tempfile
 import asyncio
+import base64
 
 # Force UTF-8 encoding for stdout on Windows to prevent emoji print crashes
 if sys.stdout.encoding != 'utf-8':
@@ -20,7 +21,7 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import our adapted modules
-from Parallel_transcription import TRANSCRIPTION_MODEL, transcribe_single_pdf, extract_statement_text
+from Parallel_transcription import LATEX_MODEL, TRANSCRIPTION_MODEL, build_latex_document, save_to_pdf, transcribe_single_pdf, extract_statement_text
 from rubric_parser import FALLBACK_MODEL as RUBRIC_FALLBACK_MODEL
 from rubric_parser import PRIMARY_MODEL as RUBRIC_PRIMARY_MODEL
 from rubric_parser import parse_rubric_from_bytes
@@ -53,6 +54,37 @@ def sse(step, message, progress, **extra):
 
 def log_model(step, model):
     print(f"[MODEL] {step}: {model}", flush=True)
+
+
+def build_transcription_document(transcription_text, work_dir):
+    """
+    Builds a previewable PDF document from the OCR transcription.
+    Returns raw text even if PDF compilation is unavailable.
+    """
+    output_base = os.path.join(work_dir, "transcribed_student_work")
+    document = {
+        "filename": "transcribed_student_work.pdf",
+        "mime_type": "application/pdf",
+        "pdf_base64": None,
+        "raw_text": transcription_text,
+    }
+
+    try:
+        log_model("transcription document", LATEX_MODEL)
+        latex_content = build_latex_document(transcription_text)
+        save_to_pdf(latex_content, output_base)
+
+        pdf_path = output_base + ".pdf"
+        if os.path.exists(pdf_path):
+            with open(pdf_path, "rb") as f:
+                document["pdf_base64"] = base64.b64encode(f.read()).decode("ascii")
+            print(f"[DOCUMENT] Transcription PDF generated: {pdf_path}", flush=True)
+        else:
+            print("[DOCUMENT] PDF compiler did not produce a transcription PDF; raw text preview will be used.", flush=True)
+    except Exception as e:
+        print(f"[DOCUMENT] Failed to generate transcription PDF: {e}", flush=True)
+
+    return document
 
 
 @app.get("/health")
@@ -110,6 +142,12 @@ async def analyze_exam(
             
             msg = f"Transcription terminée ({len(transcription_text)} caractères)"
             yield sse("transcription_done", msg, 35)
+
+            # --- Step 2b: Build preview document from transcription ---
+            yield sse("transcription_document", "Génération du document transcrit...", 37)
+            transcription_document = await asyncio.to_thread(
+                build_transcription_document, transcription_text, work_dir
+            )
             
             # --- Step 3: Parse the rubric ---
             log_model("rubric parsing", f"primary={RUBRIC_PRIMARY_MODEL}, fallback={RUBRIC_FALLBACK_MODEL}")
@@ -143,6 +181,7 @@ async def analyze_exam(
             yield sse("grading_done", "Correction terminée !", 95)
             
             # --- Step 6: Send final results ---
+            grading_results["TRANSCRIPTION_DOCUMENT"] = transcription_document
             yield sse("complete", "Analyse complète !", 100, results=grading_results)
             
         except Exception as e:
@@ -190,11 +229,13 @@ async def analyze_exam_sync(
         temp_images_dir = os.path.join(work_dir, "images")
         log_model("transcription", TRANSCRIPTION_MODEL)
         transcription_text = transcribe_single_pdf(hw_path, "", temp_images_dir)
+        transcription_document = build_transcription_document(transcription_text, work_dir)
         log_model("rubric parsing", f"primary={RUBRIC_PRIMARY_MODEL}, fallback={RUBRIC_FALLBACK_MODEL}")
         master_rubric = parse_rubric_from_bytes(rubric_bytes, rubric.filename)
         student_answers = parse_student_answers_from_text(transcription_text, master_rubric)
         log_model("correction", CORRECTION_MODEL)
         grading_results = grade_exam(master_rubric, student_answers)
+        grading_results["TRANSCRIPTION_DOCUMENT"] = transcription_document
         
         return JSONResponse(content=grading_results)
         

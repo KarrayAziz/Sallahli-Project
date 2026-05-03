@@ -13,8 +13,30 @@ LOCATION = "global"
 client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
 # Make sure to use Vertex-compatible model names here
-PRIMARY_MODEL = 'gemini-3-flash-preview' # Update with exact Vertex model ID if needed
+PRIMARY_MODEL = 'gemini-3.1-flash-lite-preview' # Update with exact Vertex model ID if needed
 FALLBACK_MODEL = 'gemini-3-flash-preview'
+
+
+def response_text_or_raise(response, model_name):
+    """Extracts text from a Gemini response and fails with a useful error if it is empty."""
+    text = getattr(response, "text", None)
+    if text:
+        return text
+
+    candidates = getattr(response, "candidates", None) or []
+    if candidates:
+        finish_reason = getattr(candidates[0], "finish_reason", None)
+        safety_ratings = getattr(candidates[0], "safety_ratings", None)
+        raise ValueError(
+            f"{model_name} returned no text. finish_reason={finish_reason}, safety_ratings={safety_ratings}"
+        )
+
+    raise ValueError(f"{model_name} returned no text and no candidates.")
+
+
+def parse_json_response(response, model_name):
+    raw_text = response_text_or_raise(response, model_name)
+    return json.loads(raw_text)
 
 def parse_rubric_pdf(pdf_path, output_json_path):
     print(f"Uploading official rubric PDF: {pdf_path}...")
@@ -68,6 +90,7 @@ def parse_rubric_pdf(pdf_path, output_json_path):
         temperature=0.1
     )   
 
+    active_model = PRIMARY_MODEL
     try:
         print(f"Parsing rubric with {PRIMARY_MODEL} (This may take 30-60 seconds)...")
         response = client.models.generate_content(
@@ -78,6 +101,7 @@ def parse_rubric_pdf(pdf_path, output_json_path):
     except genai_errors.APIError as e: # Updated to broader error catch for the new SDK
         if "503" in str(e) or "UNAVAILABLE" in str(e) or "429" in str(e):
             print(f"    {PRIMARY_MODEL} unavailable. Falling back to {FALLBACK_MODEL}...")
+            active_model = FALLBACK_MODEL
             response = client.models.generate_content(
                 model=FALLBACK_MODEL,
                 contents=[pdf_part, prompt], # Changed rubric_file to pdf_part
@@ -88,7 +112,7 @@ def parse_rubric_pdf(pdf_path, output_json_path):
 
     # 5. Clean up the response and save it
     try:
-        parsed_json = json.loads(response.text)
+        parsed_json = parse_json_response(response, active_model)
         
         with open(output_json_path, 'w', encoding='utf-8') as f:
             json.dump(parsed_json, f, indent=4, ensure_ascii=False)
@@ -162,6 +186,7 @@ def parse_rubric_from_bytes(pdf_bytes, filename="rubric.pdf"):
         temperature=0.1
     )
     
+    active_model = PRIMARY_MODEL
     try:
         print(f"  Parsing with {PRIMARY_MODEL}...")
         response = client.models.generate_content(
@@ -169,16 +194,18 @@ def parse_rubric_from_bytes(pdf_bytes, filename="rubric.pdf"):
             contents=[pdf_part, prompt], # Changed rubric_file to pdf_part
             config=model_config
         )
+        parsed_json = parse_json_response(response, PRIMARY_MODEL)
     except Exception as e:
         print(f"  ⚠️ {PRIMARY_MODEL} failed: {e}. Falling back to {FALLBACK_MODEL}...")
+        active_model = FALLBACK_MODEL
         response = client.models.generate_content(
             model=FALLBACK_MODEL,
             contents=[pdf_part, prompt], # Changed rubric_file to pdf_part
             config=model_config
         )
-    
-    parsed_json = json.loads(response.text)
-    print(f"  ✅ Rubric parsed! {len(parsed_json)} questions found.")
+        parsed_json = parse_json_response(response, FALLBACK_MODEL)
+
+    print(f"  ✅ Rubric parsed with {active_model}! {len(parsed_json)} questions found.")
     
     return parsed_json
 

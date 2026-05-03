@@ -3,7 +3,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { ChevronDown, CheckCircle, AlertTriangle, XCircle, BarChart3, Upload, FileText, X, Loader2, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { GradeResult, GradesData, BilanGlobal, SSEEvent } from './types';
+import { TranscriptionDocumentPreview } from '@/components/ui/transcription-document-preview';
+import type { GradeResult, GradesData, BilanGlobal, SSEEvent, TranscriptionDocument } from './types';
 
 type AppPhase = 'upload' | 'loading' | 'results' | 'error';
 type ScoreStatus = 'success' | 'partial' | 'failed';
@@ -195,7 +196,17 @@ function BilanCard({ bilan }: { bilan: BilanGlobal }) {
 }
 
 // --- Results View (exercises + questions) ---
-function ResultsView({ data, bilan, onReset }: { data: GradesData; bilan: BilanGlobal; onReset: () => void }) {
+function ResultsView({
+  data,
+  bilan,
+  transcriptionDocument,
+  onReset,
+}: {
+  data: GradesData;
+  bilan: BilanGlobal;
+  transcriptionDocument?: TranscriptionDocument | null;
+  onReset: () => void;
+}) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const exercises = Object.entries(data).sort(([a], [b]) => compareQuestionIds(a, b)).reduce((acc, [key, value]) => {
@@ -226,6 +237,7 @@ function ResultsView({ data, bilan, onReset }: { data: GradesData; bilan: BilanG
       </motion.div>
 
       <BilanCard bilan={bilan} />
+      <TranscriptionDocumentPreview document={transcriptionDocument} />
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-10">
@@ -340,6 +352,7 @@ export default function GradesPage() {
   const [statusMsg, setStatusMsg] = useState('');
   const [gradesData, setGradesData] = useState<GradesData | null>(null);
   const [bilan, setBilan] = useState<BilanGlobal | null>(null);
+  const [transcriptionDocument, setTranscriptionDocument] = useState<TranscriptionDocument | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [toast, setToast] = useState('');
 
@@ -392,13 +405,15 @@ export default function GradesPage() {
             if (evt.step === 'complete' && evt.results) {
               const results = evt.results as Record<string, unknown>;
               const bilanData = results['BILAN_GLOBAL'] as BilanGlobal;
+              const transcriptionDocumentData = results['TRANSCRIPTION_DOCUMENT'] as TranscriptionDocument | undefined;
               const questionsData: GradesData = {};
 
               for (const [k, v] of Object.entries(results)) {
-                if (k !== 'BILAN_GLOBAL') questionsData[k] = v as GradeResult;
+                if (k !== 'BILAN_GLOBAL' && k !== 'TRANSCRIPTION_DOCUMENT') questionsData[k] = v as GradeResult;
               }
 
               setBilan(bilanData);
+              setTranscriptionDocument(transcriptionDocumentData || null);
               setGradesData(questionsData);
               setPhase('results');
             }
@@ -422,6 +437,7 @@ export default function GradesPage() {
     setRubricFile(null);
     setGradesData(null);
     setBilan(null);
+    setTranscriptionDocument(null);
     setProgress(0);
     setStatusMsg('');
     setErrorMsg('');
@@ -429,7 +445,7 @@ export default function GradesPage() {
 
   // --- Results Phase ---
   if (phase === 'results' && gradesData && bilan) {
-    return <ResultsView data={gradesData} bilan={bilan} onReset={handleReset} />;
+    return <ResultsView data={gradesData} bilan={bilan} transcriptionDocument={transcriptionDocument} onReset={handleReset} />;
   }
 
   return (
