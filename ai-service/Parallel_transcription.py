@@ -30,9 +30,8 @@ def log_and_print(message, is_error=False):
 
 # 2. Setup Gemini
 load_dotenv()
-# Remplacez par vos vraies informations
-PROJECT_ID = "gen-lang-client-0125580043"  # L'ID que vous avez trouvé dans la console
-LOCATION = "global"                # Ou votre région préférée
+PROJECT_ID = os.environ["PROJECT_ID"]
+LOCATION = os.environ["LOCATION"]
 
 client = genai.Client(
     vertexai=True,

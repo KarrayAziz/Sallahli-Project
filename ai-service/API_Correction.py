@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -20,11 +21,11 @@ OUTPUT_GRADES_PATH = os.path.join(BASE_DIR, 'graded_results_gemini.json')
 
 
 # --- 3. CONFIGURATION DE L'API VERTEX AI ---
+load_dotenv()
 print("🔑 Authentification Google Cloud...")
 
-# Les informations de ton projet (inchangées)
-PROJECT_ID = "gen-lang-client-0125580043"
-LOCATION = "global"
+PROJECT_ID = os.environ["PROJECT_ID"]
+LOCATION = os.environ["LOCATION"]
 
 print(f"⚙️ Initialisation de Vertex AI pour le projet {PROJECT_ID}...")
 

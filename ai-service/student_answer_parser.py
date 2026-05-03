@@ -7,8 +7,8 @@ from google.genai import types
 
 # 1. Setup Environment
 load_dotenv()
-PROJECT_ID = "gen-lang-client-0125580043"
-LOCATION = "global"
+PROJECT_ID = os.environ["PROJECT_ID"]
+LOCATION = os.environ["LOCATION"]
 
 # Initialize Vertex AI client (no API key needed if ADC is set up)
 client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
