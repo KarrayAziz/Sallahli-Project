@@ -13,7 +13,7 @@ LOCATION = "global"
 client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
 # Make sure to use Vertex-compatible model names here
-PRIMARY_MODEL = 'gemini-3.1-flash-lite-preview' # Update with exact Vertex model ID if needed
+PRIMARY_MODEL = 'gemini-3-flash-preview' # Update with exact Vertex model ID if needed
 FALLBACK_MODEL = 'gemini-3-flash-preview'
 
 def parse_rubric_pdf(pdf_path, output_json_path):

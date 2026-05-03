@@ -20,9 +20,12 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import our adapted modules
-from Parallel_transcription import transcribe_single_pdf, extract_statement_text
+from Parallel_transcription import TRANSCRIPTION_MODEL, transcribe_single_pdf, extract_statement_text
+from rubric_parser import FALLBACK_MODEL as RUBRIC_FALLBACK_MODEL
+from rubric_parser import PRIMARY_MODEL as RUBRIC_PRIMARY_MODEL
 from rubric_parser import parse_rubric_from_bytes
 from student_answer_parser import parse_student_answers_from_text
+from API_Correction import MODEL_ID as CORRECTION_MODEL
 from API_Correction import grade_exam
 
 app = FastAPI(
@@ -46,6 +49,10 @@ def sse(step, message, progress, **extra):
     payload = {"step": step, "message": message, "progress": progress}
     payload.update(extra)
     return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+
+def log_model(step, model):
+    print(f"[MODEL] {step}: {model}", flush=True)
 
 
 @app.get("/health")
@@ -89,6 +96,7 @@ async def analyze_exam(
                 f.write(handwritten_bytes)
             
             # --- Step 2: Transcribe the handwritten exam ---
+            log_model("transcription", TRANSCRIPTION_MODEL)
             yield sse("transcription", "Transcription OCR en cours... (cela peut prendre 1-2 minutes)", 10)
             
             temp_images_dir = os.path.join(work_dir, "images")
@@ -104,6 +112,7 @@ async def analyze_exam(
             yield sse("transcription_done", msg, 35)
             
             # --- Step 3: Parse the rubric ---
+            log_model("rubric parsing", f"primary={RUBRIC_PRIMARY_MODEL}, fallback={RUBRIC_FALLBACK_MODEL}")
             yield sse("rubric", "Analyse du barème en cours...", 40)
             
             master_rubric = await asyncio.to_thread(
@@ -124,6 +133,7 @@ async def analyze_exam(
             yield sse("parsing_done", msg, 70)
             
             # --- Step 5: Grade with AI ---
+            log_model("correction", CORRECTION_MODEL)
             yield sse("grading", "Correction par l'IA en cours... (cela peut prendre 1-3 minutes)", 75)
             
             grading_results = await asyncio.to_thread(
@@ -178,9 +188,12 @@ async def analyze_exam_sync(
             f.write(handwritten_bytes)
         
         temp_images_dir = os.path.join(work_dir, "images")
+        log_model("transcription", TRANSCRIPTION_MODEL)
         transcription_text = transcribe_single_pdf(hw_path, "", temp_images_dir)
+        log_model("rubric parsing", f"primary={RUBRIC_PRIMARY_MODEL}, fallback={RUBRIC_FALLBACK_MODEL}")
         master_rubric = parse_rubric_from_bytes(rubric_bytes, rubric.filename)
         student_answers = parse_student_answers_from_text(transcription_text, master_rubric)
+        log_model("correction", CORRECTION_MODEL)
         grading_results = grade_exam(master_rubric, student_answers)
         
         return JSONResponse(content=grading_results)

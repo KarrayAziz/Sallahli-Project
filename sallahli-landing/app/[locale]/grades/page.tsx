@@ -8,6 +8,13 @@ import type { GradeResult, GradesData, BilanGlobal, SSEEvent } from './types';
 type AppPhase = 'upload' | 'loading' | 'results' | 'error';
 type ScoreStatus = 'success' | 'partial' | 'failed';
 
+const questionIdCollator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: 'base',
+});
+
+const compareQuestionIds = (a: string, b: string) => questionIdCollator.compare(a, b);
+
 const getScoreStatus = (score: number, maxScore = 1): ScoreStatus => {
   const ratio = maxScore > 0 ? score / maxScore : 0;
   if (ratio >= 0.75) return 'success';
@@ -191,7 +198,7 @@ function BilanCard({ bilan }: { bilan: BilanGlobal }) {
 function ResultsView({ data, bilan, onReset }: { data: GradesData; bilan: BilanGlobal; onReset: () => void }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const exercises = Object.entries(data).reduce((acc, [key, value]) => {
+  const exercises = Object.entries(data).sort(([a], [b]) => compareQuestionIds(a, b)).reduce((acc, [key, value]) => {
     const ex = key.split('_')[0];
     if (!acc[ex]) acc[ex] = [];
     acc[ex].push({ id: key, ...value });
@@ -237,7 +244,7 @@ function ResultsView({ data, bilan, onReset }: { data: GradesData; bilan: BilanG
 
       {/* Exercises */}
       <div className="space-y-6">
-        {Object.entries(exercises).map(([exKey, questions], exIdx) => (
+        {Object.entries(exercises).sort(([a], [b]) => compareQuestionIds(a, b)).map(([exKey, questions], exIdx) => (
           <motion.div key={exKey} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ delay: exIdx * 0.08 }}
             className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
@@ -255,7 +262,7 @@ function ResultsView({ data, bilan, onReset }: { data: GradesData; bilan: BilanG
             </div>
 
             <div className="divide-y divide-border">
-              {questions.map((q) => {
+              {questions.slice().sort((a, b) => compareQuestionIds(a.id, b.id)).map((q) => {
                 const st = getScoreStatus(q.ai_evaluation?.score_final || 0, q.max_score || 1);
                 const isOpen = expanded === q.id;
                 return (

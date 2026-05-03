@@ -40,6 +40,10 @@ client = genai.Client(
     location=LOCATION
 )
 
+STATEMENT_EXTRACTION_MODEL = 'gemini-3-flash-preview'
+TRANSCRIPTION_MODEL = 'gemini-3-flash-preview'
+LATEX_MODEL = 'gemini-3.1-flash-lite-preview'
+
 
 def extract_statement_text(pdf_path):
     """Reads PDF locally and sends bytes to Gemini for context extraction."""
@@ -55,7 +59,7 @@ def extract_statement_text(pdf_path):
     prompt = "Transcribe the full text of this exam statement PDF accurately. I will use this as context for future OCR tasks."
     
     response = client.models.generate_content(
-        model='gemini-3-flash-preview',
+        model=STATEMENT_EXTRACTION_MODEL,
         contents=[pdf_part, prompt]
     )
     return response.text.strip()
@@ -186,10 +190,8 @@ def get_transcription(image_path, extracted_statement_text):
     contents.append(student_image)
     contents.append(prompt)
 
-    MODEL = 'gemini-3-flash-preview'
-
     response = client.models.generate_content(
-        model=MODEL,
+        model=TRANSCRIPTION_MODEL,
         contents=contents
     )
             
@@ -241,7 +243,7 @@ def build_latex_document(raw_text):
     """
 
     response = client.models.generate_content(
-        model='gemini-3.1-flash-lite-preview',
+        model=LATEX_MODEL,
         contents=[prompt]
     )
     return response.text
@@ -304,6 +306,7 @@ def transcribe_single_pdf(pdf_path, statement_text="", temp_dir=None):
     os.makedirs(temp_dir, exist_ok=True)
     
     log_and_print(f"📄 Transcribing single PDF: {os.path.basename(pdf_path)}")
+    log_and_print(f"[MODEL] transcription: {TRANSCRIPTION_MODEL}")
     
     # Step 1: Convert PDF to images
     page_paths = pdf_to_images(pdf_path, output_folder=temp_dir)
