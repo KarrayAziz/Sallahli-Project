@@ -855,3 +855,374 @@
 2026-05-02 11:26:04 - INFO - 1 change detected
 2026-05-02 11:26:05 - INFO - 1 change detected
 2026-05-02 11:26:05 - INFO - 1 change detected
+2026-05-02 11:26:06 - INFO - 1 change detected
+2026-05-02 11:30:36 - INFO - 📄 Transcribing single PDF: handwritten.pdf
+2026-05-02 11:30:36 - INFO -   Converting PDF to images...
+2026-05-02 11:33:09 - INFO -     Saved page 1 -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_ohe24yfy\images\page_01.jpg
+2026-05-02 11:33:09 - INFO -     Saved page 2 -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_ohe24yfy\images\page_02.jpg
+2026-05-02 11:33:09 - INFO -     Cropped top 45% from first image -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_ohe24yfy\images\page_01_right_cropped.jpg
+2026-05-02 11:33:09 - INFO -   Final transcription order (4 images):
+2026-05-02 11:33:09 - INFO -     1. page_01_right_cropped.jpg
+2026-05-02 11:33:09 - INFO -     2. page_02_left.jpg
+2026-05-02 11:33:09 - INFO -     3. page_02_right.jpg
+2026-05-02 11:33:09 - INFO -     4. page_01_left.jpg
+2026-05-02 11:33:09 - INFO -   Starting transcription...
+2026-05-02 11:33:09 - INFO -     Transcribing image 1/4: page_01_right_cropped.jpg
+2026-05-02 11:33:09 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:33:51 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:33:51 - INFO -     Transcribing image 2/4: page_02_left.jpg
+2026-05-02 11:33:51 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:34:16 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:34:16 - INFO -     Transcribing image 3/4: page_02_right.jpg
+2026-05-02 11:34:16 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:34:29 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:34:29 - INFO -     Transcribing image 4/4: page_01_left.jpg
+2026-05-02 11:34:29 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:35:05 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:35:05 - INFO -   ✅ Transcription complete. Total length: 4220 chars.
+2026-05-02 11:35:05 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:35:47 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:35:47 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:35:54 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:35:54 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:35:58 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:35:59 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:00 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:01 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:02 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:03 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:05 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:06 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:07 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:08 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:09 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:10 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:11 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:12 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:14 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:15 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:16 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:17 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:18 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:19 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:20 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:21 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:23 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:24 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:40 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:41 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:42 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:43 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:44 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:45 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:47 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:48 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:49 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:50 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:51 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:52 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:53 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:54 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:56 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:57 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:36:58 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:36:59 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:37:01 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:37:02 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:37:03 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 11:37:04 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 11:37:05 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:43:27 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:43:30 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:43:30 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:43:31 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:43:35 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:43:36 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:43:37 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:43:37 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:43:38 - INFO - 1 change detected
+2026-05-02 16:43:38 - INFO - 1 change detected
+2026-05-02 16:43:39 - INFO - 1 change detected
+2026-05-02 16:43:39 - INFO - 2 changes detected
+2026-05-02 16:43:40 - INFO - 4 changes detected
+2026-05-02 16:43:40 - INFO - 1 change detected
+2026-05-02 16:43:40 - INFO - 1 change detected
+2026-05-02 16:43:41 - INFO - 1 change detected
+2026-05-02 16:43:41 - INFO - 1 change detected
+2026-05-02 16:43:42 - INFO - 1 change detected
+2026-05-02 16:43:42 - INFO - 1 change detected
+2026-05-02 16:43:42 - INFO - 1 change detected
+2026-05-02 16:43:43 - INFO - 1 change detected
+2026-05-02 16:43:43 - INFO - 1 change detected
+2026-05-02 16:43:44 - INFO - 1 change detected
+2026-05-02 16:43:44 - INFO - 1 change detected
+2026-05-02 16:43:44 - INFO - 1 change detected
+2026-05-02 16:43:45 - INFO - 1 change detected
+2026-05-02 16:43:45 - INFO - 1 change detected
+2026-05-02 16:43:46 - INFO - 1 change detected
+2026-05-02 16:43:46 - INFO - 1 change detected
+2026-05-02 16:43:46 - INFO - 1 change detected
+2026-05-02 16:43:47 - INFO - 1 change detected
+2026-05-02 16:43:48 - INFO - 1 change detected
+2026-05-02 16:43:48 - INFO - 1 change detected
+2026-05-02 16:43:48 - INFO - 1 change detected
+2026-05-02 16:43:49 - INFO - 1 change detected
+2026-05-02 16:43:49 - INFO - 1 change detected
+2026-05-02 16:43:50 - INFO - 1 change detected
+2026-05-02 16:43:50 - INFO - 1 change detected
+2026-05-02 16:43:50 - INFO - 1 change detected
+2026-05-02 16:43:51 - INFO - 1 change detected
+2026-05-02 16:43:51 - INFO - 1 change detected
+2026-05-02 16:43:52 - INFO - 1 change detected
+2026-05-02 16:43:52 - INFO - 1 change detected
+2026-05-02 16:43:52 - INFO - 1 change detected
+2026-05-02 16:43:53 - INFO - 1 change detected
+2026-05-02 16:43:53 - INFO - 1 change detected
+2026-05-02 16:43:54 - INFO - 1 change detected
+2026-05-02 16:43:54 - INFO - 1 change detected
+2026-05-02 16:43:55 - INFO - 1 change detected
+2026-05-02 16:43:55 - INFO - 1 change detected
+2026-05-02 16:43:56 - INFO - 1 change detected
+2026-05-02 16:43:56 - INFO - 1 change detected
+2026-05-02 16:43:56 - INFO - 1 change detected
+2026-05-02 16:43:57 - INFO - 1 change detected
+2026-05-02 16:43:57 - INFO - 1 change detected
+2026-05-02 16:43:58 - INFO - 1 change detected
+2026-05-02 16:43:58 - INFO - 1 change detected
+2026-05-02 16:43:58 - INFO - 1 change detected
+2026-05-02 16:43:59 - INFO - 1 change detected
+2026-05-02 16:43:59 - INFO - 1 change detected
+2026-05-02 16:44:00 - INFO - 1 change detected
+2026-05-02 16:44:00 - INFO - 1 change detected
+2026-05-02 16:44:01 - INFO - 1 change detected
+2026-05-02 16:44:01 - INFO - 1 change detected
+2026-05-02 16:44:01 - INFO - 1 change detected
+2026-05-02 16:44:02 - INFO - 1 change detected
+2026-05-02 16:44:02 - INFO - 1 change detected
+2026-05-02 16:44:03 - INFO - 1 change detected
+2026-05-02 16:44:03 - INFO - 1 change detected
+2026-05-02 16:44:03 - INFO - 1 change detected
+2026-05-02 16:44:04 - INFO - 1 change detected
+2026-05-02 16:44:04 - INFO - 1 change detected
+2026-05-02 16:44:05 - INFO - 1 change detected
+2026-05-02 16:44:05 - INFO - 1 change detected
+2026-05-02 16:44:06 - INFO - 1 change detected
+2026-05-02 16:44:07 - INFO - 1 change detected
+2026-05-02 16:44:07 - INFO - 1 change detected
+2026-05-02 16:44:08 - INFO - 1 change detected
+2026-05-02 16:44:08 - INFO - 1 change detected
+2026-05-02 16:44:08 - INFO - 1 change detected
+2026-05-02 16:44:09 - INFO - 1 change detected
+2026-05-02 16:44:09 - INFO - 1 change detected
+2026-05-02 16:44:10 - INFO - 1 change detected
+2026-05-02 16:44:10 - INFO - 1 change detected
+2026-05-02 16:44:10 - INFO - 1 change detected
+2026-05-02 16:44:11 - INFO - 1 change detected
+2026-05-02 16:44:11 - INFO - 1 change detected
+2026-05-02 16:44:12 - INFO - 1 change detected
+2026-05-02 16:44:12 - INFO - 1 change detected
+2026-05-02 16:44:13 - INFO - 1 change detected
+2026-05-02 16:44:13 - INFO - 1 change detected
+2026-05-02 16:44:13 - INFO - 1 change detected
+2026-05-02 16:44:14 - INFO - 1 change detected
+2026-05-02 16:44:14 - INFO - 1 change detected
+2026-05-02 16:44:15 - INFO - 1 change detected
+2026-05-02 16:44:15 - INFO - 1 change detected
+2026-05-02 16:44:16 - INFO - 1 change detected
+2026-05-02 16:44:16 - INFO - 1 change detected
+2026-05-02 16:44:17 - INFO - 1 change detected
+2026-05-02 16:44:18 - INFO - 1 change detected
+2026-05-02 16:44:18 - INFO - 1 change detected
+2026-05-02 16:44:19 - INFO - 1 change detected
+2026-05-02 16:44:20 - INFO - 1 change detected
+2026-05-02 16:44:20 - INFO - 1 change detected
+2026-05-02 16:44:21 - INFO - 1 change detected
+2026-05-02 16:44:21 - INFO - 1 change detected
+2026-05-02 16:44:22 - INFO - 1 change detected
+2026-05-02 16:44:22 - INFO - 1 change detected
+2026-05-02 16:44:23 - INFO - 1 change detected
+2026-05-02 16:44:24 - INFO - 1 change detected
+2026-05-02 16:44:24 - INFO - 1 change detected
+2026-05-02 16:44:25 - INFO - 1 change detected
+2026-05-02 16:44:26 - INFO - 1 change detected
+2026-05-02 16:44:26 - INFO - 1 change detected
+2026-05-02 16:44:27 - INFO - 1 change detected
+2026-05-02 16:44:27 - INFO - 1 change detected
+2026-05-02 16:44:28 - INFO - 1 change detected
+2026-05-02 16:44:28 - INFO - 1 change detected
+2026-05-02 16:44:29 - INFO - 1 change detected
+2026-05-02 16:44:29 - INFO - 1 change detected
+2026-05-02 16:44:29 - INFO - 1 change detected
+2026-05-02 16:44:30 - INFO - 1 change detected
+2026-05-02 16:44:31 - INFO - 1 change detected
+2026-05-02 16:44:32 - INFO - 1 change detected
+2026-05-02 16:44:32 - INFO - 1 change detected
+2026-05-02 16:44:33 - INFO - 1 change detected
+2026-05-02 16:44:33 - INFO - 1 change detected
+2026-05-02 16:44:34 - INFO - 1 change detected
+2026-05-02 16:44:35 - INFO - 1 change detected
+2026-05-02 16:44:36 - INFO - 1 change detected
+2026-05-02 16:44:36 - INFO - 1 change detected
+2026-05-02 16:44:37 - INFO - 1 change detected
+2026-05-02 16:44:37 - INFO - 1 change detected
+2026-05-02 16:44:38 - INFO - 1 change detected
+2026-05-02 16:44:39 - INFO - 1 change detected
+2026-05-02 16:44:39 - INFO - 1 change detected
+2026-05-02 16:44:40 - INFO - 1 change detected
+2026-05-02 16:44:40 - INFO - 1 change detected
+2026-05-02 16:44:40 - INFO - 1 change detected
+2026-05-02 16:44:41 - INFO - 1 change detected
+2026-05-02 16:44:42 - INFO - 1 change detected
+2026-05-02 16:44:42 - INFO - 1 change detected
+2026-05-02 16:44:43 - INFO - 1 change detected
+2026-05-02 16:44:43 - INFO - 1 change detected
+2026-05-02 16:44:44 - INFO - 1 change detected
+2026-05-02 16:44:44 - INFO - 1 change detected
+2026-05-02 16:44:45 - INFO - 1 change detected
+2026-05-02 16:44:46 - INFO - 1 change detected
+2026-05-02 16:44:46 - INFO - 1 change detected
+2026-05-02 16:44:47 - INFO - 1 change detected
+2026-05-02 16:44:47 - INFO - 1 change detected
+2026-05-02 16:44:48 - INFO - 1 change detected
+2026-05-02 16:46:01 - INFO - 📄 Transcribing single PDF: handwritten.pdf
+2026-05-02 16:46:01 - INFO -   Converting PDF to images...
+2026-05-02 16:46:05 - INFO -     Saved page 1 -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_449px2r1\images\page_01.jpg
+2026-05-02 16:46:05 - INFO -     Saved page 2 -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_449px2r1\images\page_02.jpg
+2026-05-02 16:46:05 - INFO -     Cropped top 45% from first image -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_449px2r1\images\page_01_right_cropped.jpg
+2026-05-02 16:46:05 - INFO -   Final transcription order (4 images):
+2026-05-02 16:46:05 - INFO -     1. page_01_right_cropped.jpg
+2026-05-02 16:46:05 - INFO -     2. page_02_left.jpg
+2026-05-02 16:46:05 - INFO -     3. page_02_right.jpg
+2026-05-02 16:46:05 - INFO -     4. page_01_left.jpg
+2026-05-02 16:46:05 - INFO -   Starting transcription...
+2026-05-02 16:46:05 - INFO -   Launching 4 parallel transcription calls...
+2026-05-02 16:50:54 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:50:55 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:50:56 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:50:58 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:51:05 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:51:07 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:51:07 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:51:08 - INFO - The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-05-02 16:51:17 - INFO - 1 change detected
+2026-05-02 16:51:18 - INFO - 1 change detected
+2026-05-02 16:51:19 - INFO - 1 change detected
+2026-05-02 16:51:19 - INFO - 1 change detected
+2026-05-02 16:51:21 - INFO - 1 change detected
+2026-05-02 16:51:21 - INFO - 1 change detected
+2026-05-02 16:51:22 - INFO - 1 change detected
+2026-05-02 16:51:22 - INFO - 1 change detected
+2026-05-02 16:51:23 - INFO - 1 change detected
+2026-05-02 16:51:23 - INFO - 1 change detected
+2026-05-02 16:51:24 - INFO - 1 change detected
+2026-05-02 16:51:25 - INFO - 1 change detected
+2026-05-02 16:51:39 - INFO - 📄 Transcribing single PDF: handwritten.pdf
+2026-05-02 16:51:39 - INFO -   Converting PDF to images...
+2026-05-02 16:51:40 - INFO -     Saved page 1 -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_hjpsfnyf\images\page_01.jpg
+2026-05-02 16:51:40 - INFO -     Saved page 2 -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_hjpsfnyf\images\page_02.jpg
+2026-05-02 16:51:40 - INFO -     Cropped top 45% from first image -> C:\Users\AZIZ\AppData\Local\Temp\sallahli_job_hjpsfnyf\images\page_01_right_cropped.jpg
+2026-05-02 16:51:40 - INFO -   Final transcription order (4 images):
+2026-05-02 16:51:40 - INFO -     1. page_01_right_cropped.jpg
+2026-05-02 16:51:40 - INFO -     2. page_02_left.jpg
+2026-05-02 16:51:40 - INFO -     3. page_02_right.jpg
+2026-05-02 16:51:40 - INFO -     4. page_01_left.jpg
+2026-05-02 16:51:40 - INFO -   Starting transcription...
+2026-05-02 16:51:40 - INFO -   Launching 4 parallel transcription calls...
+2026-05-02 16:51:40 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:51:40 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:51:40 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:51:40 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:51:41 - INFO - 1 change detected
+2026-05-02 16:51:42 - INFO - 1 change detected
+2026-05-02 16:51:42 - INFO - 1 change detected
+2026-05-02 16:51:43 - INFO - 1 change detected
+2026-05-02 16:51:43 - INFO - 1 change detected
+2026-05-02 16:51:44 - INFO - 1 change detected
+2026-05-02 16:51:45 - INFO - 1 change detected
+2026-05-02 16:51:46 - INFO - 1 change detected
+2026-05-02 16:51:46 - INFO - 1 change detected
+2026-05-02 16:51:47 - INFO - 1 change detected
+2026-05-02 16:51:47 - INFO - 1 change detected
+2026-05-02 16:51:48 - INFO - 1 change detected
+2026-05-02 16:51:58 - INFO - 1 change detected
+2026-05-02 16:52:01 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:52:01 - INFO -     ✅ Image 1/4 done: page_01_right_cropped.jpg
+2026-05-02 16:52:03 - INFO - 1 change detected
+2026-05-02 16:52:04 - INFO - 1 change detected
+2026-05-02 16:52:08 - INFO - 1 change detected
+2026-05-02 16:52:08 - INFO - 1 change detected
+2026-05-02 16:52:09 - INFO - 1 change detected
+2026-05-02 16:52:09 - INFO - 1 change detected
+2026-05-02 16:52:10 - INFO - 1 change detected
+2026-05-02 16:52:10 - INFO - 1 change detected
+2026-05-02 16:52:12 - INFO - 1 change detected
+2026-05-02 16:52:14 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:52:14 - INFO -     ✅ Image 3/4 done: page_02_right.jpg
+2026-05-02 16:52:15 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:52:15 - INFO -     ✅ Image 2/4 done: page_02_left.jpg
+2026-05-02 16:52:19 - INFO - 1 change detected
+2026-05-02 16:52:21 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3-flash-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:52:21 - INFO -     ✅ Image 4/4 done: page_01_left.jpg
+2026-05-02 16:52:22 - INFO -     Processing result 1/4
+2026-05-02 16:52:22 - INFO -     Processing result 2/4
+2026-05-02 16:52:22 - INFO -     Processing result 3/4
+2026-05-02 16:52:22 - INFO -     Processing result 4/4
+2026-05-02 16:52:22 - INFO -   ✅ Transcription complete. Total length: 4163 chars.
+2026-05-02 16:52:22 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:52:22 - INFO - 1 change detected
+2026-05-02 16:52:25 - INFO - 1 change detected
+2026-05-02 16:52:26 - INFO - 1 change detected
+2026-05-02 16:52:27 - INFO - 1 change detected
+2026-05-02 16:52:27 - INFO - 1 change detected
+2026-05-02 16:52:28 - INFO - 1 change detected
+2026-05-02 16:52:29 - INFO - 1 change detected
+2026-05-02 16:52:30 - INFO - 1 change detected
+2026-05-02 16:52:33 - INFO - 1 change detected
+2026-05-02 16:52:34 - INFO - 1 change detected
+2026-05-02 16:52:55 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:52:55 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:02 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:02 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:02 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:02 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:02 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:02 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:07 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:07 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:07 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:07 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:08 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:08 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:08 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:08 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:09 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:09 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:09 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:09 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:09 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:09 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:10 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:10 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:10 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:10 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:10 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:10 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:11 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:11 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:11 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:11 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:11 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:11 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:12 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:12 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:12 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:12 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:12 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:12 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:13 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:13 - INFO - AFC is enabled with max remote calls: 10.
+2026-05-02 16:53:13 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:14 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:14 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:14 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-05-02 16:53:14 - INFO - HTTP Request: POST https://aiplatform.googleapis.com/v1beta1/projects/gen-lang-client-0125580043/locations/global/publishers/google/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"

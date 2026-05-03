@@ -20,7 +20,7 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import our adapted modules
-from Transcribing_Class import transcribe_single_pdf, extract_statement_text
+from Parallel_transcription import transcribe_single_pdf, extract_statement_text
 from rubric_parser import parse_rubric_from_bytes
 from student_answer_parser import parse_student_answers_from_text
 from API_Correction import grade_exam

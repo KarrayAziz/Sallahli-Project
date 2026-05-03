@@ -3,6 +3,7 @@ import os
 import time
 from google import genai
 from google.genai import types
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # --- 1. CONFIGURATION DES CHEMINS ---
 # On utilise un chemin local. Pointant par exemple vers un dossier "data" 
@@ -118,52 +119,61 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
     
     print(f"\n🚀 STARTING AI GRADING ({total_questions} questions)")
     print("-" * 50)
-    
-    for i, rubric_item in enumerate(master_rubric):
+
+    def grade_single(args):
+        i, rubric_item = args
         q_id = rubric_item.get("question_id")
         max_score = rubric_item.get("max_score", 0)
-        
-        if q_id in student_answers:
-            print(f"📡 Grading question {q_id} ({i+1}/{total_questions})...")
-            student_ans = student_answers[q_id]
-            
+
+        if q_id not in student_answers:
+            return i, q_id, None
+
+        student_ans = student_answers[q_id]
+        print(f"📡 Grading question {q_id} ({i+1}/{total_questions})...")
+
+        try:
+            grade_result_str = grade_question_gemini(student_ans, rubric_item)
+            evaluation = json.loads(grade_result_str)
+
             try:
-                grade_result_str = grade_question_gemini(student_ans, rubric_item)
-                evaluation = json.loads(grade_result_str)
-                
-                try:
-                    score_obtenu = float(evaluation.get("score_final", 0.0))
-                except (ValueError, TypeError):
-                    score_obtenu = 0.0
-                
-                note_globale += score_obtenu
-                
-                final_grades[q_id] = {
-                    "student_answer": student_ans,
-                    "ai_evaluation": evaluation,
-                    "max_score": max_score
-                }
-                
-                print(f"   ✅ {q_id} graded! Score: {score_obtenu} / {max_score}")
-                
-                if progress_callback:
-                    progress_callback(q_id, score_obtenu, max_score, i + 1, total_questions)
-                
-                time.sleep(1)
-                
-            except Exception as e:
-                print(f"   ❌ Error grading {q_id}: {e}")
-                final_grades[q_id] = {
-                    "student_answer": student_ans,
-                    "ai_evaluation": {
-                        "raisonnement": f"Erreur lors de la correction: {str(e)}",
-                        "score_final": 0.0,
-                        "justification": "Une erreur technique est survenue."
-                    },
-                    "max_score": max_score,
-                    "erreur": str(e)
-                }
-    
+                score_obtenu = float(evaluation.get("score_final", 0.0))
+            except (ValueError, TypeError):
+                score_obtenu = 0.0
+
+            print(f"   ✅ {q_id} graded! Score: {score_obtenu} / {max_score}")
+            return i, q_id, {
+                "student_answer": student_ans,
+                "ai_evaluation": evaluation,
+                "max_score": max_score,
+                "score": score_obtenu
+            }
+
+        except Exception as e:
+            print(f"   ❌ Error grading {q_id}: {e}")
+            return i, q_id, {
+                "student_answer": student_ans,
+                "ai_evaluation": {
+                    "raisonnement": f"Erreur lors de la correction: {str(e)}",
+                    "score_final": 0.0,
+                    "justification": "Une erreur technique est survenue."
+                },
+                "max_score": max_score,
+                "score": 0.0,
+                "erreur": str(e)
+            }
+
+    with ThreadPoolExecutor(max_workers=min(total_questions, 5)) as executor:
+        futures = {executor.submit(grade_single, (i, item)): i for i, item in enumerate(master_rubric)}
+        for future in as_completed(futures):
+            i, q_id, result = future.result()
+            if result is None:
+                continue
+            score_obtenu = result.pop("score")
+            note_globale += score_obtenu
+            final_grades[q_id] = result
+            if progress_callback:
+                progress_callback(q_id, score_obtenu, result["max_score"], i + 1, total_questions)
+
     # Calculate the total max possible score
     total_max = sum(item.get("max_score", 0) for item in master_rubric)
     # Scale to /20 if needed
@@ -171,7 +181,7 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
         note_sur_20 = round((note_globale / total_max) * 20, 2)
     else:
         note_sur_20 = round(note_globale, 2)
-    
+
     final_grades["BILAN_GLOBAL"] = {
         "total_points": round(note_globale, 2),
         "total_max": round(total_max, 2),
@@ -179,10 +189,10 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
         "message": "Somme automatique de tous les scores partiels calculés par l'IA.",
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
     }
-    
+
     print("-" * 50)
     print(f"🎓 FINAL SCORE: {round(note_globale, 2)} / {round(total_max, 2)} ({note_sur_20}/20)")
-    
+
     return final_grades
 
 
