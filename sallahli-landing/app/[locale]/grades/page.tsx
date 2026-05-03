@@ -8,6 +8,12 @@ import type { GradeResult, GradesData, BilanGlobal, SSEEvent, TranscriptionDocum
 
 type AppPhase = 'upload' | 'loading' | 'results' | 'error';
 type ScoreStatus = 'success' | 'partial' | 'failed';
+type StepProgress = {
+  label: string;
+  percent: number;
+  completed?: number;
+  total?: number;
+} | null;
 
 const questionIdCollator = new Intl.Collator(undefined, {
   numeric: true,
@@ -96,7 +102,7 @@ function FileDropZone({ label, file, onFile, onRemove, icon }: {
 }
 
 // --- Loading View ---
-function LoadingView({ progress, message }: { progress: number; message: string }) {
+function LoadingView({ progress, message, stepProgress }: { progress: number; message: string; stepProgress: StepProgress }) {
   const steps = [
     { key: 'upload', label: 'Envoi des fichiers', icon: '📤', threshold: 5 },
     { key: 'transcription', label: 'Transcription OCR', icon: '📝', threshold: 10 },
@@ -119,6 +125,28 @@ function LoadingView({ progress, message }: { progress: number; message: string 
           <motion.div className="h-full bg-gradient-to-r from-primary to-secondary rounded-full"
             initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.5 }} />
         </div>
+
+        {stepProgress && (
+          <div className="bg-card border border-border rounded-xl p-4 text-left space-y-3">
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-sm font-bold text-foreground">{stepProgress.label}</span>
+              <span className="text-sm font-black text-primary">{stepProgress.percent}%</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <motion.div
+                className="h-full bg-primary rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${stepProgress.percent}%` }}
+                transition={{ duration: 0.35 }}
+              />
+            </div>
+            {typeof stepProgress.completed === 'number' && typeof stepProgress.total === 'number' && (
+              <p className="text-xs text-muted-foreground">
+                {stepProgress.completed} / {stepProgress.total}
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="space-y-3 text-left">
           {steps.map((s) => {
@@ -349,6 +377,7 @@ export default function GradesPage() {
   const [hwFile, setHwFile] = useState<File | null>(null);
   const [rubricFile, setRubricFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
+  const [stepProgress, setStepProgress] = useState<StepProgress>(null);
   const [statusMsg, setStatusMsg] = useState('');
   const [gradesData, setGradesData] = useState<GradesData | null>(null);
   const [bilan, setBilan] = useState<BilanGlobal | null>(null);
@@ -363,6 +392,7 @@ export default function GradesPage() {
 
     setPhase('loading');
     setProgress(2);
+    setStepProgress(null);
     setStatusMsg('Envoi des fichiers...');
 
     const formData = new FormData();
@@ -397,6 +427,16 @@ export default function GradesPage() {
             const evt: SSEEvent = JSON.parse(line.slice(6));
             setProgress(evt.progress);
             setStatusMsg(evt.message);
+            if (typeof evt.step_progress === 'number') {
+              setStepProgress({
+                label: evt.step_label || evt.message,
+                percent: evt.step_progress,
+                completed: evt.step_completed,
+                total: evt.step_total,
+              });
+            } else if (!evt.step.endsWith('_progress')) {
+              setStepProgress(null);
+            }
 
             if (evt.step === 'error') {
               throw new Error(evt.message);
@@ -439,6 +479,7 @@ export default function GradesPage() {
     setBilan(null);
     setTranscriptionDocument(null);
     setProgress(0);
+    setStepProgress(null);
     setStatusMsg('');
     setErrorMsg('');
   };
@@ -451,7 +492,7 @@ export default function GradesPage() {
   return (
     <>
       <AnimatePresence>{toast && <Toast message={toast} onClose={() => setToast('')} />}</AnimatePresence>
-      {phase === 'loading' && <LoadingView progress={progress} message={statusMsg} />}
+      {phase === 'loading' && <LoadingView progress={progress} message={statusMsg} stepProgress={stepProgress} />}
 
       <div className="min-h-screen flex items-center justify-center py-16 px-4">
         <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}

@@ -285,7 +285,7 @@ def save_to_pdf(latex_content, output_filename):
 
 
 # --- Single-File Processing (for API use) ---
-def transcribe_single_pdf(pdf_path, statement_text="", temp_dir=None):
+def transcribe_single_pdf(pdf_path, statement_text="", temp_dir=None, progress_callback=None):
     """
     Transcribes a single handwritten exam PDF and returns the raw text.
     This is the API-friendly version — no LaTeX/PDF generation.
@@ -294,6 +294,8 @@ def transcribe_single_pdf(pdf_path, statement_text="", temp_dir=None):
         pdf_path: Path to the student's handwritten exam PDF.
         statement_text: Optional extracted exam statement text for context.
         temp_dir: Optional temp directory for intermediate images.
+        progress_callback: Optional callable(completed, total, image_name)
+            for real-time progress reporting.
         
     Returns:
         str: The full raw transcription text.
@@ -321,6 +323,7 @@ def transcribe_single_pdf(pdf_path, statement_text="", temp_dir=None):
     
     log_and_print(f"  Launching {len(ordered_images)} parallel transcription calls...")
     results = [None] * len(ordered_images)
+    completed_images = 0
 
     with ThreadPoolExecutor(max_workers=len(ordered_images)) as executor:
         future_to_index = {
@@ -331,6 +334,9 @@ def transcribe_single_pdf(pdf_path, statement_text="", temp_dir=None):
             idx = future_to_index[future]
             results[idx] = future.result()
             log_and_print(f"    ✅ Image {idx+1}/{len(ordered_images)} done: {os.path.basename(ordered_images[idx])}")
+            completed_images += 1
+            if progress_callback:
+                progress_callback(completed_images, len(ordered_images), os.path.basename(ordered_images[idx]))
 
     for j, segment_text in enumerate(results):
         log_and_print(f"    Processing result {j+1}/{len(ordered_images)}")

@@ -34,5 +34,10 @@ export interface SSEEvent {
   step: string;
   message: string;
   progress: number;
+  step_progress?: number;
+  step_completed?: number;
+  step_total?: number;
+  step_label?: string;
+  item?: string;
   results?: Record<string, unknown>;
 }

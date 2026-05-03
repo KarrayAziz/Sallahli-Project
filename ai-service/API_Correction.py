@@ -130,7 +130,7 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
     Args:
         master_rubric: List of rubric question dicts.
         student_answers: Dict mapping question_id -> student answer text.
-        progress_callback: Optional callable(question_id, score, max_score, index, total)
+        progress_callback: Optional callable(question_id, score, max_score, completed, total)
             for real-time progress reporting.
         
     Returns:
@@ -187,15 +187,17 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
 
     with ThreadPoolExecutor(max_workers=min(total_questions, 5)) as executor:
         futures = {executor.submit(grade_single, (i, item)): i for i, item in enumerate(master_rubric)}
+        completed_questions = 0
         for future in as_completed(futures):
             i, q_id, result = future.result()
             if result is None:
                 continue
+            completed_questions += 1
             score_obtenu = result.pop("score")
             note_globale += score_obtenu
             completed_grades[q_id] = result
             if progress_callback:
-                progress_callback(q_id, score_obtenu, result["max_score"], i + 1, total_questions)
+                progress_callback(q_id, score_obtenu, result["max_score"], completed_questions, total_questions)
 
     # Preserve the rubric order in the final JSON even though grading runs in parallel.
     for rubric_item in master_rubric:

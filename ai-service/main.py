@@ -52,6 +52,25 @@ def sse(step, message, progress, **extra):
     return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
 
 
+def make_thread_progress_callback(loop, queue, event_factory):
+    def emit_progress(*callback_args):
+        event = event_factory(*callback_args)
+        loop.call_soon_threadsafe(queue.put_nowait, event)
+
+    return emit_progress
+
+
+async def drain_progress_until_done(task, queue):
+    while not task.done():
+        try:
+            yield await asyncio.wait_for(queue.get(), timeout=0.1)
+        except asyncio.TimeoutError:
+            pass
+
+    while not queue.empty():
+        yield queue.get_nowait()
+
+
 def log_model(step, model):
     print(f"[MODEL] {step}: {model}", flush=True)
 
@@ -132,9 +151,34 @@ async def analyze_exam(
             yield sse("transcription", "Transcription OCR en cours... (cela peut prendre 1-2 minutes)", 10)
             
             temp_images_dir = os.path.join(work_dir, "images")
-            transcription_text = await asyncio.to_thread(
-                transcribe_single_pdf, hw_path, "", temp_images_dir
+            loop = asyncio.get_running_loop()
+            transcription_queue = asyncio.Queue()
+            transcription_callback = make_thread_progress_callback(
+                loop,
+                transcription_queue,
+                lambda completed, total, image_name: sse(
+                    "transcription_progress",
+                    f"Transcription OCR: {completed}/{total} pages traitées",
+                    10 + round((completed / max(total, 1)) * 25),
+                    step_progress=round((completed / max(total, 1)) * 100),
+                    step_completed=completed,
+                    step_total=total,
+                    step_label="Transcription OCR",
+                    item=image_name,
+                ),
             )
+            transcription_task = asyncio.create_task(
+                asyncio.to_thread(
+                    transcribe_single_pdf,
+                    hw_path,
+                    "",
+                    temp_images_dir,
+                    progress_callback=transcription_callback,
+                )
+            )
+            async for progress_event in drain_progress_until_done(transcription_task, transcription_queue):
+                yield progress_event
+            transcription_text = await transcription_task
             
             if not transcription_text or len(transcription_text.strip()) < 10:
                 yield sse("error", "La transcription est vide. Le PDF ne semble pas contenir d'écriture manuscrite lisible.", 0)
@@ -174,9 +218,32 @@ async def analyze_exam(
             log_model("correction", CORRECTION_MODEL)
             yield sse("grading", "Correction par l'IA en cours... (cela peut prendre 1-3 minutes)", 75)
             
-            grading_results = await asyncio.to_thread(
-                grade_exam, master_rubric, student_answers
+            grading_queue = asyncio.Queue()
+            grading_callback = make_thread_progress_callback(
+                loop,
+                grading_queue,
+                lambda q_id, score, max_score, completed, total: sse(
+                    "grading_progress",
+                    f"Correction IA: {completed}/{total} questions corrigées",
+                    75 + round((completed / max(total, 1)) * 20),
+                    step_progress=round((completed / max(total, 1)) * 100),
+                    step_completed=completed,
+                    step_total=total,
+                    step_label="Correction par l'IA",
+                    item=q_id,
+                ),
             )
+            grading_task = asyncio.create_task(
+                asyncio.to_thread(
+                    grade_exam,
+                    master_rubric,
+                    student_answers,
+                    progress_callback=grading_callback,
+                )
+            )
+            async for progress_event in drain_progress_until_done(grading_task, grading_queue):
+                yield progress_event
+            grading_results = await grading_task
             
             yield sse("grading_done", "Correction terminée !", 95)
             
