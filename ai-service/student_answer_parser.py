@@ -1,9 +1,11 @@
 import os
 import json
+import re
 from dotenv import load_dotenv
 from google import genai
 from google.genai import errors as genai_errors
 from google.genai import types
+from json_safety import safe_json_loads
 
 # 1. Setup Environment
 load_dotenv()
@@ -16,6 +18,61 @@ client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 # Make sure to use Vertex-compatible model names
 PRIMARY_MODEL = 'gemini-3.1-flash-lite-preview' 
 FALLBACK_MODEL = 'gemini-3-flash-preview'
+
+
+def _strip_json_fences(raw_text):
+    text = (raw_text or "").strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"\s*```$", "", text)
+    return text.strip()
+
+
+def _fallback_extract_answers(raw_text, expected_qids):
+    """
+    Last-resort parser for the student answer JSON object.
+
+    Student answers can contain raw LaTeX backslashes and unescaped quotes
+    copied from handwriting, so strict JSON may fail. The keys are known from
+    the rubric; use them as anchors and preserve the answer text between keys.
+    """
+    text = _strip_json_fences(raw_text)
+    extracted = {}
+
+    positions = []
+    for qid in expected_qids:
+        match = re.search(rf'"{re.escape(qid)}"\s*:\s*"', text)
+        if match:
+            positions.append((qid, match.start(), match.end()))
+
+    positions.sort(key=lambda item: item[1])
+    for index, (qid, _start, value_start) in enumerate(positions):
+        if index + 1 < len(positions):
+            value_end = positions[index + 1][1]
+            raw_value = text[value_start:value_end]
+            raw_value = re.sub(r'"\s*,\s*$', "", raw_value, flags=re.DOTALL)
+        else:
+            raw_value = text[value_start:]
+            raw_value = re.sub(r'"\s*}\s*$', "", raw_value, flags=re.DOTALL)
+            raw_value = re.sub(r'"\s*,?\s*$', "", raw_value, flags=re.DOTALL)
+
+        raw_value = raw_value.strip()
+        raw_value = raw_value.replace(r"\n", "\n").replace(r"\t", "\t")
+        raw_value = raw_value.replace(r"\"", '"').replace(r"\\", "\\")
+        extracted[qid] = raw_value
+
+    if not extracted:
+        raise ValueError("Unable to recover student answers from malformed JSON.")
+
+    print(f"  [JSON] Recovered {len(extracted)} answers from malformed student-answer JSON.", flush=True)
+    return extracted
+
+
+def parse_student_answer_json(raw_text, expected_qids):
+    try:
+        return safe_json_loads(raw_text, context="student answer extraction from text")
+    except json.JSONDecodeError:
+        return _fallback_extract_answers(raw_text, expected_qids)
 
 def parse_student_transcription(pdf_path, output_json_path, rubric_path="master_rubric.json"):
     print(f"Uploading student transcription: {pdf_path}...")
@@ -50,7 +107,8 @@ def parse_student_transcription(pdf_path, output_json_path, rubric_path="master_
     4. RÈGLE POUR LE TEXTE (VALEURS) : La valeur associée à la clé doit être TOUT le texte de la réponse (incluant les descriptions d'images).
     5. Ne corrige pas les fautes d'orthographe de l'étudiant.
 
-    RENVOIE UNIQUEMENT UN OBJET JSON VALIDE (Un dictionnaire simple {{clé: valeur}}). 
+    RENVOIE UNIQUEMENT UN OBJET JSON VALIDE (Un dictionnaire simple {{clé: valeur}}).
+    IMPORTANT : dans toutes les valeurs JSON, échappe chaque antislash avec un double antislash. Exemple : écris "\\\\frac{{x}}{{y}}" et jamais "\\frac{{x}}{{y}}".
     """
 
     model_config = types.GenerateContentConfig(
@@ -76,7 +134,7 @@ def parse_student_transcription(pdf_path, output_json_path, rubric_path="master_
 
     # 5. Process and fill blanks
     try:
-        parsed_json = json.loads(response.text)
+        parsed_json = parse_student_answer_json(response.text, expected_qids)
         
         # Remplissage de sécurité strict
         final_json = {}
@@ -130,7 +188,8 @@ def parse_student_answers_from_text(transcription_text, rubric_json):
     {transcription_text}
     \"\"\"
 
-    RENVOIE UNIQUEMENT UN OBJET JSON VALIDE (Un dictionnaire simple {{clé: valeur}}). 
+    RENVOIE UNIQUEMENT UN OBJET JSON VALIDE (Un dictionnaire simple {{clé: valeur}}).
+    IMPORTANT : dans toutes les valeurs JSON, échappe chaque antislash avec un double antislash. Exemple : écris "\\\\frac{{x}}{{y}}" et jamais "\\frac{{x}}{{y}}".
     """
     
     model_config = types.GenerateContentConfig(
@@ -153,7 +212,7 @@ def parse_student_answers_from_text(transcription_text, rubric_json):
             config=model_config
         )
     
-    parsed_json = json.loads(response.text)
+    parsed_json = parse_student_answer_json(response.text, expected_qids)
     
     # Fill blanks for any missing questions
     final_json = {}

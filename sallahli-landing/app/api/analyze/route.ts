@@ -20,13 +20,15 @@ export async function POST(request: NextRequest) {
     // Get the FormData from the incoming request
     const formData = await request.formData();
 
-    const handwrittenWork = formData.get('handwritten_work');
+    const handwrittenWorkFiles = formData
+      .getAll('handwritten_work')
+      .filter((item): item is File => item instanceof File);
     const rubric = formData.get('rubric');
 
     // Validate both files are present
-    if (!handwrittenWork || !(handwrittenWork instanceof File)) {
+    if (handwrittenWorkFiles.length === 0) {
       return NextResponse.json(
-        { error: 'Le fichier "Copie manuscrite" est requis.' },
+        { error: 'Au moins une "Copie manuscrite" est requise.' },
         { status: 400 }
       );
     }
@@ -39,7 +41,9 @@ export async function POST(request: NextRequest) {
 
     // Build a new FormData to send to the Python service
     const proxyFormData = new FormData();
-    proxyFormData.append('handwritten_work', handwrittenWork, handwrittenWork.name);
+    for (const file of handwrittenWorkFiles) {
+      proxyFormData.append('handwritten_work', file, file.name);
+    }
     proxyFormData.append('rubric', rubric, rubric.name);
 
     // Forward to the Python service (SSE endpoint)

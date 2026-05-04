@@ -11,6 +11,7 @@ import shutil
 import tempfile
 import asyncio
 import base64
+from typing import List
 
 # Force UTF-8 encoding for stdout on Windows to prevent emoji print crashes
 if sys.stdout.encoding != 'utf-8':
@@ -27,7 +28,7 @@ from rubric_parser import PRIMARY_MODEL as RUBRIC_PRIMARY_MODEL
 from rubric_parser import parse_rubric_from_bytes
 from student_answer_parser import parse_student_answers_from_text
 from API_Correction import MODEL_ID as CORRECTION_MODEL
-from API_Correction import grade_exam
+from API_Correction import grade_exam, grade_exam_async
 
 app = FastAPI(
     title="Sallahli AI Service",
@@ -106,12 +107,293 @@ def build_transcription_document(transcription_text, work_dir):
     return document
 
 
+def write_file_bytes(path, content):
+    with open(path, "wb") as f:
+        f.write(content)
+
+
+def parse_note_sur_20(value):
+    try:
+        return float(str(value).split("/")[0])
+    except (ValueError, TypeError, IndexError):
+        return 0.0
+
+
+def build_batch_summary(batch_results):
+    successful = [item for item in batch_results if item.get("status") == "completed"]
+    failed = [item for item in batch_results if item.get("status") != "completed"]
+    notes = [
+        parse_note_sur_20(item.get("results", {}).get("BILAN_GLOBAL", {}).get("note_sur_20"))
+        for item in successful
+    ]
+    average = round(sum(notes) / len(notes), 2) if notes else 0.0
+
+    return {
+        "total_files": len(batch_results),
+        "completed": len(successful),
+        "failed": len(failed),
+        "average_note_sur_20": f"{average}/20",
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+async def process_student_exam(
+    file_payload,
+    master_rubric,
+    batch_semaphore,
+    event_queue,
+    loop,
+    batch_work_dir,
+):
+    file_index = file_payload["file_index"]
+    filename = file_payload["filename"]
+
+    def exam_sse(step, message, progress, **extra):
+        return sse(
+            step,
+            message,
+            progress,
+            file=filename,
+            file_index=file_index,
+            **extra,
+        )
+
+    async with batch_semaphore:
+        work_dir = os.path.join(batch_work_dir, f"exam_{file_index}")
+        os.makedirs(work_dir, exist_ok=True)
+
+        try:
+            event_queue.put_nowait(exam_sse("exam_started", "Traitement de la copie demarre.", 5))
+
+            hw_path = os.path.join(work_dir, "handwritten.pdf")
+            await asyncio.to_thread(write_file_bytes, hw_path, file_payload["content"])
+
+            log_model(f"transcription [{filename}]", TRANSCRIPTION_MODEL)
+            event_queue.put_nowait(exam_sse("transcription", "Transcription OCR en cours...", 10))
+
+            temp_images_dir = os.path.join(work_dir, "images")
+            transcription_callback = make_thread_progress_callback(
+                loop,
+                event_queue,
+                lambda completed, total, image_name: exam_sse(
+                    "transcription_progress",
+                    f"Transcription OCR: {completed}/{total} pages traitees",
+                    10 + round((completed / max(total, 1)) * 25),
+                    step_progress=round((completed / max(total, 1)) * 100),
+                    step_completed=completed,
+                    step_total=total,
+                    step_label="Transcription OCR",
+                    item=image_name,
+                ),
+            )
+            transcription_text = await asyncio.to_thread(
+                transcribe_single_pdf,
+                hw_path,
+                "",
+                temp_images_dir,
+                progress_callback=transcription_callback,
+            )
+
+            if not transcription_text or len(transcription_text.strip()) < 10:
+                raise ValueError("La transcription est vide. Le PDF ne semble pas contenir d'ecriture manuscrite lisible.")
+
+            event_queue.put_nowait(
+                exam_sse(
+                    "transcription_done",
+                    f"Transcription terminee ({len(transcription_text)} caracteres)",
+                    35,
+                )
+            )
+
+            event_queue.put_nowait(exam_sse("transcription_document", "Generation du document transcrit...", 37))
+            transcription_document = await asyncio.to_thread(
+                build_transcription_document,
+                transcription_text,
+                work_dir,
+            )
+
+            event_queue.put_nowait(exam_sse("parsing", "Extraction des reponses de l'etudiant...", 60))
+            student_answers = await asyncio.to_thread(
+                parse_student_answers_from_text,
+                transcription_text,
+                master_rubric,
+            )
+            event_queue.put_nowait(
+                exam_sse("parsing_done", f"Reponses extraites ({len(student_answers)} reponses)", 70)
+            )
+
+            log_model(f"correction [{filename}]", CORRECTION_MODEL)
+            event_queue.put_nowait(exam_sse("grading", "Correction par l'IA en cours...", 75))
+
+            def grading_callback(q_id, score, max_score, completed, total):
+                event_queue.put_nowait(
+                    exam_sse(
+                        "grading_progress",
+                        f"Correction IA: {completed}/{total} questions corrigees",
+                        75 + round((completed / max(total, 1)) * 20),
+                        step_progress=round((completed / max(total, 1)) * 100),
+                        step_completed=completed,
+                        step_total=total,
+                        step_label="Correction par l'IA",
+                        item=q_id,
+                        score=score,
+                        max_score=max_score,
+                    )
+                )
+
+            grading_results = await grade_exam_async(
+                master_rubric,
+                student_answers,
+                progress_callback=grading_callback,
+            )
+            grading_results["TRANSCRIPTION_DOCUMENT"] = transcription_document
+
+            event_queue.put_nowait(exam_sse("exam_complete", "Copie corrigee.", 100))
+            return {
+                "file": filename,
+                "file_index": file_index,
+                "status": "completed",
+                "results": grading_results,
+            }
+
+        except Exception as e:
+            error_msg = str(e)
+            print(f"Pipeline error for {filename}: {error_msg}", flush=True)
+            event_queue.put_nowait(exam_sse("exam_error", f"Erreur: {error_msg}", 0, error=error_msg))
+            return {
+                "file": filename,
+                "file_index": file_index,
+                "status": "error",
+                "error": error_msg,
+            }
+
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "service": "sallahli-ai"}
 
 
 @app.post("/api/analyze")
+async def analyze_exam_batch(
+    handwritten_work: List[UploadFile] = File(..., description="Student handwritten exam PDFs"),
+    rubric: UploadFile = File(..., description="Official rubric/correction PDF"),
+):
+    """
+    Batch AI correction pipeline.
+    Parses the rubric once, then processes multiple student PDFs concurrently.
+    """
+    if not handwritten_work:
+        raise HTTPException(status_code=400, detail="Au moins une copie manuscrite PDF est requise.")
+
+    for upload in handwritten_work:
+        if not upload.filename.lower().endswith(".pdf"):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Copie manuscrite: PDF requis. Recu: {upload.filename}",
+            )
+    if not rubric.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail=f"Bareme: PDF requis. Recu: {rubric.filename}")
+
+    handwritten_payloads = [
+        {
+            "file_index": i,
+            "filename": upload.filename,
+            "content": await upload.read(),
+        }
+        for i, upload in enumerate(handwritten_work)
+    ]
+    rubric_bytes = await rubric.read()
+
+    async def event_stream():
+        work_dir = tempfile.mkdtemp(prefix="sallahli_batch_")
+
+        try:
+            yield sse(
+                "batch_started",
+                f"{len(handwritten_payloads)} copie(s) recue(s). Analyse du bareme...",
+                5,
+                total_files=len(handwritten_payloads),
+            )
+
+            log_model("rubric parsing", f"primary={RUBRIC_PRIMARY_MODEL}, fallback={RUBRIC_FALLBACK_MODEL}")
+            yield sse("rubric", "Analyse du bareme en cours...", 10, total_files=len(handwritten_payloads))
+            master_rubric = await asyncio.to_thread(
+                parse_rubric_from_bytes,
+                rubric_bytes,
+                rubric.filename,
+            )
+            yield sse(
+                "rubric_done",
+                f"Bareme analyse ({len(master_rubric)} questions detectees). Lancement du batch...",
+                15,
+                total_files=len(handwritten_payloads),
+            )
+
+            loop = asyncio.get_running_loop()
+            event_queue = asyncio.Queue()
+            batch_semaphore = asyncio.Semaphore(3)
+            tasks = [
+                asyncio.create_task(
+                    process_student_exam(
+                        payload,
+                        master_rubric,
+                        batch_semaphore,
+                        event_queue,
+                        loop,
+                        work_dir,
+                    )
+                )
+                for payload in handwritten_payloads
+            ]
+
+            pending = set(tasks)
+            while pending:
+                done, pending = await asyncio.wait(
+                    pending,
+                    timeout=0.1,
+                    return_when=asyncio.FIRST_COMPLETED,
+                )
+                while not event_queue.empty():
+                    yield event_queue.get_nowait()
+
+            while not event_queue.empty():
+                yield event_queue.get_nowait()
+
+            batch_results = await asyncio.gather(*tasks)
+            batch_results.sort(key=lambda item: item.get("file_index", 0))
+            summary = build_batch_summary(batch_results)
+
+            yield sse(
+                "complete",
+                "Analyse batch complete !",
+                100,
+                results={
+                    "BATCH_RESULTS": batch_results,
+                    "BILAN_BATCH": summary,
+                },
+            )
+
+        except Exception as e:
+            error_msg = str(e)
+            print(f"Batch pipeline error: {error_msg}", flush=True)
+            yield sse("error", f"Erreur du serveur: {error_msg}", 0)
+
+        finally:
+            if os.path.exists(work_dir):
+                shutil.rmtree(work_dir, ignore_errors=True)
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@app.post("/api/analyze-legacy")
 async def analyze_exam(
     handwritten_work: UploadFile = File(..., description="Student's handwritten exam PDF"),
     rubric: UploadFile = File(..., description="Official rubric/correction PDF"),

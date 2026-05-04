@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import errors as genai_errors
 from google.genai import types      
+from json_safety import safe_json_loads
 
 
 # 1. Setup Environment
@@ -36,7 +37,7 @@ def response_text_or_raise(response, model_name):
 
 def parse_json_response(response, model_name):
     raw_text = response_text_or_raise(response, model_name)
-    return json.loads(raw_text)
+    return safe_json_loads(raw_text, context=f"rubric parsing with {model_name}")
 
 def parse_rubric_pdf(pdf_path, output_json_path):
     print(f"Uploading official rubric PDF: {pdf_path}...")
@@ -82,6 +83,7 @@ def parse_rubric_pdf(pdf_path, output_json_path):
         }
     ]
     RENVOIE UNIQUEMENT UN TABLEAU JSON VALIDE.
+    IMPORTANT : dans toutes les chaînes JSON, échappe chaque antislash avec un double antislash. Exemple : écris "\\\\frac{{x}}{{y}}" et jamais "\\frac{{x}}{{y}}".
     """
 
     # 4. Generate the Structured Content with fallback
@@ -178,6 +180,7 @@ def parse_rubric_from_bytes(pdf_bytes, filename="rubric.pdf"):
         }
     ]
     RENVOIE UNIQUEMENT UN TABLEAU JSON VALIDE.
+    IMPORTANT : dans toutes les chaînes JSON, échappe chaque antislash avec un double antislash. Exemple : écris "\\\\frac{{x}}{{y}}" et jamais "\\frac{{x}}{{y}}".
     """
         
     # Fixed: config must be a types.GenerateContentConfig object, not a dict

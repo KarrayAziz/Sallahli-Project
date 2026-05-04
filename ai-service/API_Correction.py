@@ -1,10 +1,12 @@
 import json
 import os
 import time
+import asyncio
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from json_safety import safe_json_loads
 
 # --- 1. CONFIGURATION DES CHEMINS ---
 # On utilise un chemin local. Pointant par exemple vers un dossier "data" 
@@ -73,6 +75,7 @@ Tu dois évaluer la réponse de l'étudiant en appliquant rigoureusement les rè
 
 --- CONTRAINTE DE FORMATAGE TECHNIQUE OBLIGATOIRE ---
 Pour que mon système Python fonctionne, tu dois renvoyer ton évaluation UNIQUEMENT sous forme de JSON valide.
+IMPORTANT : dans toutes les chaînes JSON, échappe chaque antislash avec un double antislash. Exemple : écris "\\\\frac{{x}}{{y}}" et jamais "\\frac{{x}}{{y}}".
 Le JSON DOIT avoir cette structure exacte :
 {{
     "raisonnement": "Ton application de la Règle 6 (si graphique) puis ta liste des sous-critères avec mention Validé/Partiellement validé/Non validé et tes justifications détaillées.",
@@ -159,7 +162,7 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
 
         try:
             grade_result_str = grade_question_gemini(student_ans, rubric_item)
-            evaluation = json.loads(grade_result_str)
+            evaluation = safe_json_loads(grade_result_str, context=f"grading {q_id}")
 
             score_obtenu = normalize_score(evaluation.get("score_final", 0.0), max_score)
             evaluation["score_final"] = score_obtenu
@@ -228,6 +231,110 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
     return final_grades
 
 
+async def grade_exam_async(master_rubric, student_answers, progress_callback=None):
+    """
+    Async API-friendly grading for one exam.
+
+    Gemini calls are blocking in the SDK, so each question is executed in a
+    threadpool. All available questions are launched without a per-copy
+    concurrency limit.
+    """
+    final_grades = {}
+    completed_grades = {}
+    note_globale = 0.0
+    total_questions = len(master_rubric)
+    semaphore = asyncio.Semaphore(max(1, total_questions))
+
+    print(f"\n🚀 STARTING ASYNC AI GRADING ({total_questions} questions)")
+    print(f"🤖 Correction model: {MODEL_ID}")
+    print("-" * 50)
+
+    async def grade_single(i, rubric_item):
+        q_id = rubric_item.get("question_id")
+        max_score = rubric_item.get("max_score", 0)
+
+        if q_id not in student_answers:
+            return i, q_id, None
+
+        student_ans = student_answers[q_id]
+        print(f"📡 Grading question {q_id} ({i+1}/{total_questions})...")
+
+        async with semaphore:
+            try:
+                grade_result_str = await asyncio.to_thread(
+                    grade_question_gemini,
+                    student_ans,
+                    rubric_item,
+                )
+                evaluation = safe_json_loads(grade_result_str, context=f"grading {q_id}")
+
+                score_obtenu = normalize_score(evaluation.get("score_final", 0.0), max_score)
+                evaluation["score_final"] = score_obtenu
+
+                print(f"   ✅ {q_id} graded! Score: {score_obtenu} / {max_score}")
+                return i, q_id, {
+                    "student_answer": student_ans,
+                    "ai_evaluation": evaluation,
+                    "max_score": max_score,
+                    "score": score_obtenu
+                }
+
+            except Exception as e:
+                print(f"   ❌ Error grading {q_id}: {e}")
+                return i, q_id, {
+                    "student_answer": student_ans,
+                    "ai_evaluation": {
+                        "raisonnement": f"Erreur lors de la correction: {str(e)}",
+                        "score_final": 0.0,
+                        "justification": "Une erreur technique est survenue."
+                    },
+                    "max_score": max_score,
+                    "score": 0.0,
+                    "erreur": str(e)
+                }
+
+    tasks = [
+        asyncio.create_task(grade_single(i, item))
+        for i, item in enumerate(master_rubric)
+    ]
+    completed_questions = 0
+
+    for task in asyncio.as_completed(tasks):
+        i, q_id, result = await task
+        if result is None:
+            continue
+        completed_questions += 1
+        score_obtenu = result.pop("score")
+        note_globale += score_obtenu
+        completed_grades[q_id] = result
+        if progress_callback:
+            progress_callback(q_id, score_obtenu, result["max_score"], completed_questions, total_questions)
+
+    for rubric_item in master_rubric:
+        q_id = rubric_item.get("question_id")
+        if q_id in completed_grades:
+            final_grades[q_id] = completed_grades[q_id]
+
+    total_max = sum(item.get("max_score", 0) for item in master_rubric)
+    if total_max > 0 and total_max != 20:
+        note_sur_20 = normalize_score((note_globale / total_max) * 20, 20)
+    else:
+        note_sur_20 = normalize_score(note_globale, 20)
+
+    final_grades["BILAN_GLOBAL"] = {
+        "total_points": round(note_globale, 2),
+        "total_max": round(total_max, 2),
+        "note_sur_20": f"{note_sur_20}/20",
+        "message": "Somme automatique de tous les scores partiels calculés par l'IA.",
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    print("-" * 50)
+    print(f"🎓 FINAL SCORE: {round(note_globale, 2)} / {round(total_max, 2)} ({note_sur_20}/20)")
+
+    return final_grades
+
+
 # --- 5. EXÉCUTION DE LA CORRECTION ---
 
 if __name__ == "__main__":
@@ -264,7 +371,7 @@ if __name__ == "__main__":
             try:
                 # 1. Appel API pour la question spécifique
                 grade_result_str = grade_question_gemini(student_ans, rubric_item)
-                evaluation = json.loads(grade_result_str)
+                evaluation = safe_json_loads(grade_result_str, context=f"grading {q_id}")
                 
                 # 2. Sécurisation et extraction du score
                 score_obtenu = normalize_score(evaluation.get("score_final", 0.0), max_score)
