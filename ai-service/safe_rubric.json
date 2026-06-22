@@ -1,0 +1,292 @@
+{
+    "questions": [
+        {
+            "question_id": "Ex1_Q1",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "Décrire précisément et brièvement une application qui peut utiliser ce jeu de données.",
+            "max_score": 1.0,
+            "criteria": [
+                {
+                    "condition": "Les autorités de gestion des routes peuvent analyser les types d'accidents et leur gravité selon le type d'infrastucture routière et les conditions externes (météo, présence d'obstacles) pour prendre des mesures correctives à titre préventif. Un autre exemple c'est de développer une application SIG qui affiche les accidents sur une carte interactive (via les variables Latitude/Longitude) et identifie les zones à forte concentration d'accidents. Ou également, aider les autorités locales à prioriser des actions comme installation de radars, amélioration du revêtement, ajout de signalisation ...",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex1_Q2",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "La variable « Speed_Limit » est-elle à ratio ou à intervalle ?",
+            "max_score": 0.5,
+            "criteria": [
+                {
+                    "condition": "Il existe un zéro absolu qui signifie aucun mouvement. On peut faire des rapports pour comparer deux vitesses.",
+                    "points": 0.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex1_Q3.a",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "Parmi les variables mentionnées, indiquer une variable : Quantitative discrète,",
+            "max_score": 0.25,
+            "criteria": [
+                {
+                    "condition": "Number_of_Casualties et Number_of_Vehicle",
+                    "points": 0.25
+                }
+            ]
+        },
+        {
+            "question_id": "Ex1_Q3.b",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "Parmi les variables mentionnées, indiquer une variable : Une variable qualitative ordinale,",
+            "max_score": 0.25,
+            "criteria": [
+                {
+                    "condition": "Accident Severity",
+                    "points": 0.25
+                }
+            ]
+        },
+        {
+            "question_id": "Ex1_Q3.c",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "Parmi les variables mentionnées, indiquer une variable : Une variable qualitative catégorielle.",
+            "max_score": 0.25,
+            "criteria": [
+                {
+                    "condition": "Road_Surface_Conditions",
+                    "points": 0.25
+                }
+            ]
+        },
+        {
+            "question_id": "Ex1_Q4",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "Le tableau 1 fournit le pourcentage de données manquantes pour les deux variables «Carriageway_Hazard» et «Accident_Severity». Quelle(s) solution(s) sont à adopter pour résoudre ce problème ?",
+            "max_score": 1.0,
+            "criteria": [
+                {
+                    "condition": "Il y a une écrasante majorité de données manquantes pour «Carriageway_Hazard» : on enlève cette variable. On peut imputer la variable binaire «Accident_Severity» par le mode (c.à.d la valeur la plus fréquente) ou d'utiliser d'autres variables.",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex1_Q5.a",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "Le tableau 2 fournit quelques statistiques de la variable « Speed_limit ».\\\\nTracer la boîte à moustache (boxplot) et conclure quant à la présence de valeurs aberrantes (outliers).",
+            "max_score": 1.25,
+            "criteria": [
+                {
+                    "condition": "On calcule l'intervalle interquartile IQR=Q3-Q1=20. On calcule la moustache basse max[min, Q1-1.5IQR]=max[10,30-30]=10. On calcule la moustache haute min[max,Q3+1.5IQR]=min[80, 50+30]=80. Il n'y a pas d'outlier puisqu'il n'y a aucune valeur au-delà des moustaches.",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex1_Q5.b",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "Que peut-on dire sur la symétrie ou l'asymétrie de la distribution ?",
+            "max_score": 1.0,
+            "criteria": [
+                {
+                    "condition": "Il s'agit d'une distribution asymétrique étalée à droite (queue à droite) puisque mode <Q2<Moyenne. Le skewness ou coefficient d'asymétrie est positif.",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex1_Q6",
+            "context": "Le jeu de données « Road_Accidents» contient les informations sur les 30773 accidents de la route recensés en Grande Bretagne pour la période 2021-2022. Plus précisément, pour chaque accident repéré par un identifiant unique ID, voici une partie des descripteurs :\\\n• (Latitude, Longitude) : les deux coordonnées géographiques du lieu de l'accident,\\\n• Number of Casualties: le nombre de victimes,\\\n• Number_of_Vehicle : le nombre de véhicules impliqués,\\\n• Speed_limit: La vitesse maximale autorisée par la loi sur le lieu de l'accident (l'unité de mesure est le mile per hour ou mph),\\\n• Accident Severity : la sévérité de l'accident (mortel, sérieux, léger)\\\n• Road_Surface_Conditions : état de la surface de la route (sèche, humide, gelée, enneigée, inondée)\\\n• Carriageway_Hazard : présence ou absence d'obstacles dangereux sur la route (par exemple, animaux, objets tombés sur la route)",
+            "question_text": "On veut créer une nouvelle variable permettant d'accéder au nombre d'accidents par gouvernorat. Comment s'appelle une telle création de variable ?",
+            "max_score": 0.5,
+            "criteria": [
+                {
+                    "condition": "Il s'agit d'une opération d'agrégation de données qui permet de donner un aperçu à l'échelle locale de chaque gouvernorat sur les accidents qui y ont eu lieu.",
+                    "points": 0.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex2_Q1",
+            "context": "On considère l'ensemble S de scores obtenu par un groupe de 28 étudiants :\\\n50, 50, 49, 49, 49, 48, 48, 40, 39, 39, 35, 30, 30, 30, 26, 25, 25, 24, 24, 23, 20, 20, 20, 19, 15, 14, 13, 10",
+            "question_text": "Tracer l'histogramme à largeur égale à 8.",
+            "max_score": 1.5,
+            "criteria": [
+                {
+                    "condition": "La largeur commune des bins est 50-10/N=8 => on aura 5 bins. En considérant l'histogramme de ce dataset on a :\\\n[10-18[ (10, 13, 14, 15) => nbre d'occurrences 4\\\n[18-26[ (19, 20, 20, 20, 23, 24, 24, 25, 25) => nbre d'occurrences 9\\\n[26-34[ (26, 30, 30, 30) => nbre d'occurrences 4\\\n[34-42[ (35, 39, 39, 40) => nbre d'occurrences 4\\\n[42-50] (48, 48, 49, 49, 49, 50, 50) => nbre d'occurrences 7",
+                    "points": 1.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex2_Q2",
+            "context": "On considère l'ensemble S de scores obtenu par un groupe de 28 étudiants :\\\n50, 50, 49, 49, 49, 48, 48, 40, 39, 39, 35, 30, 30, 30, 26, 25, 25, 24, 24, 23, 20, 20, 20, 19, 15, 14, 13, 10",
+            "question_text": "Que peut-on dire sur la modalité de cet histogramme ?",
+            "max_score": 1.0,
+            "criteria": [
+                {
+                    "condition": "L'histogramme présente deux pics de fréquence importants, l'un dans la classe [18 – 26[ (fréquence 9) et l'autre dans la classe [42 - 50] (fréquence 7). Les autres classes ont une fréquence nettement plus faible (valeur 4). Il s'agit donc d'une distribution appelée bimodale.",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex2_Q3",
+            "context": "On considère l'ensemble S de scores obtenu par un groupe de 28 étudiants :\\\n50, 50, 49, 49, 49, 48, 48, 40, 39, 39, 35, 30, 30, 30, 26, 25, 25, 24, 24, 23, 20, 20, 20, 19, 15, 14, 13, 10",
+            "question_text": "Calculer la médiane de ces données. Expliquer si la moyenne arithmétique (valant environ 30.90) est un indicateur pertinent pour résumer cette distribution ou s'il vaut mieux utiliser la médiane.",
+            "max_score": 1.5,
+            "criteria": [
+                {
+                    "condition": "Le nombre de données est pair : la médiane est la demi-somme des valeurs de rang 14 (26) et 15 (30) => (26+30)/2= 28. Compte tenu de la forte dispersion des données la médiane constitue un indicateur plus fiable de la tendance centrale, car elle représente mieux le score « typique » d'un élève. La moyenne tombe au milieu, là où il y a peu d'élèves. En effet, la moyenne ≈ 30.9 ne correspond à aucun groupe réel d'élèves. Par contre, la médiane (28) est déjà plus proche du groupe majoritaire.",
+                    "points": 1.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex2_Q4",
+            "context": "On considère l'ensemble S de scores obtenu par un groupe de 28 étudiants :\\\n50, 50, 49, 49, 49, 48, 48, 40, 39, 39, 35, 30, 30, 30, 26, 25, 25, 24, 24, 23, 20, 20, 20, 19, 15, 14, 13, 10",
+            "question_text": "On applique maintenant une transformation logarithmique aux scores S\" = log10(S). Expliquer comment cette transformation modifie la forme de l'histogramme.",
+            "max_score": 1.0,
+            "criteria": [
+                {
+                    "condition": "Une transformation logarithmique agit principalement en compressant les grandes valeurs et en étirant les petites valeurs. Dans le cas de cet histogramme bimodal : Les valeurs de la classe haute [42–50] sont fortement compressées. Les petites valeurs de [10–18[ sont légèrement étirées, rendant la classe plus visible. L'écart entre classes se réduit : les deux groupes initialement distincts deviennent plus proches. La bimodalité s'atténue considérablement et la distribution apparaît plus compacte et presque unimodale, dominée par la classe [18-26[.",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_Q5.a",
+            "context": "Le club des étudiants étudie les offres de deux librairies X et Y d'un même produit sous différents formats. La table 3 fournit les statistiques des prix des différentes versions.",
+            "question_text": "Quel magasin présente la plus grande dispersion absolue ?",
+            "max_score": 0.25,
+            "criteria": [
+                {
+                    "condition": "Le Magasin Y présente la plus grande dispersion absolue valant 4.",
+                    "points": 0.25
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_Q5.b",
+            "context": "Le club des étudiants étudie les offres de deux librairies X et Y d'un même produit sous différents formats. La table 3 fournit les statistiques des prix des différentes versions.",
+            "question_text": "Quel magasin présente la plus grande dispersion relative qui est définie comme le rapport écart-type sur moyenne?",
+            "max_score": 0.25,
+            "criteria": [
+                {
+                    "condition": "CV(X) = 3 / 10 = 0,30 (30 %) CV(Y) = 4 / 25 = 0,16 (16%). Le magasin X a la plus grande dispersion relative.",
+                    "points": 0.25
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_Q5.c",
+            "context": "Le club des étudiants étudie les offres de deux librairies X et Y d'un même produit sous différents formats. La table 3 fournit les statistiques des prix des différentes versions.",
+            "question_text": "Expliquer l'intérêt de la dispersion absolue et de la dispersion relative pour faciliter le choix du club des étudiants pour des prix stables.",
+            "max_score": 0.5,
+            "criteria": [
+                {
+                    "condition": "Si le club veut éviter des prix trop variables en valeur absolue, il choisira le magasin X. Si un client veut éviter des prix variables proportionnellement au prix moyen, il choisira le magasin Y.",
+                    "points": 0.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_PARTIE_I_Q1.1",
+            "context": "Un opérateur mobile souhaite analyser le données relatives à ses clients en se basant sur les six variables suivantes :\\\n1. Data_Usage (Mo/mois) : volume total de données mobiles consommées par le client chaque mois.\\\n2. Voice_Minutes (min/mois) : nombre total de minutes d'appel consommées par le client chaque mois.\\\n3. Montant_Facture (TND) : montant mensuel payé par le client, incluant l'abonnement et les éventuelles options.\\\n4. Ancienneté (mois) : durée depuis laquelle le client est abonné à l'opérateur.\\\n5. Satisfaction (/10) : score global de satisfaction fourni par le client.\\\n6. Incidents (par mois) : nombre d'incidents techniques ou réclamations déclarés par le client.\\\\nPour illustrer l'application de l'ACP sur un jeu de données télécoms réaliste, on s'intéresse à un échantillon composé de 8 clients ayant un abonnement de type postpayé. Les données caractéristiques sont fournies dans la table 4.",
+            "question_text": "Dans quelle étape et quelle phase du processus CRISP-DM se situe l'Analyse en Composantes Principales (ACP) ?",
+            "max_score": 0.5,
+            "criteria": [
+                {
+                    "condition": "L'Analyse en Composantes Principales (ACP) appartient à la phase 3 du CRISP-DM : Data Preparation. Plus précisément, elle se situe dans la sous-étape : Transformation des données (Data Construction ou Formatage des données).",
+                    "points": 0.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_PARTIE_I_Q1.2",
+            "context": "Un opérateur mobile souhaite analyser le données relatives à ses clients en se basant sur les six variables suivantes :\\\n1. Data_Usage (Mo/mois) : volume total de données mobiles consommées par le client chaque mois.\\\n2. Voice_Minutes (min/mois) : nombre total de minutes d'appel consommées par le client chaque mois.\\\n3. Montant_Facture (TND) : montant mensuel payé par le client, incluant l'abonnement et les éventuelles options.\\\n4. Ancienneté (mois) : durée depuis laquelle le client est abonné à l'opérateur.\\\n5. Satisfaction (/10) : score global de satisfaction fourni par le client.\\\n6. Incidents (par mois) : nombre d'incidents techniques ou réclamations déclarés par le client.\\\\nPour illustrer l'application de l'ACP sur un jeu de données télécoms réaliste, on s'intéresse à un échantillon composé de 8 clients ayant un abonnement de type postpayé. Les données caractéristiques sont fournies dans la table 4.",
+            "question_text": "Pourquoi l'ACP est-elle pertinente dans l'analyse de clients ayant un abonnement de type postpayé ?",
+            "max_score": 1.5,
+            "criteria": [
+                {
+                    "condition": "Les variables Data_Usage, Voice_Minutes et Montant_Facture sont corrélées : dans un contrat postpayé, un client qui consomme beaucoup paie généralement plus. Les services postpayés créent une structure temporelle (ancienneté, facture stable, habitudes d'usage). Les variables Satisfaction et Incidents traduisent une autre dimension : l'expérience client. L'ACP réduit la dimension tout en conservant structure et variances importantes, facilitant la segmentation/classification, la détection du churn, la visualisation de groupes de clients, la préparation de données pour du machine learning.",
+                    "points": 1.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_PARTIE_I_Q1.3",
+            "context": "Un opérateur mobile souhaite analyser le données relatives à ses clients en se basant sur les six variables suivantes :\\\n1. Data_Usage (Mo/mois) : volume total de données mobiles consommées par le client chaque mois.\\\n2. Voice_Minutes (min/mois) : nombre total de minutes d'appel consommées par le client chaque mois.\\\n3. Montant_Facture (TND) : montant mensuel payé par le client, incluant l'abonnement et les éventuelles options.\\\n4. Ancienneté (mois) : durée depuis laquelle le client est abonné à l'opérateur.\\\n5. Satisfaction (/10) : score global de satisfaction fourni par le client.\\\n6. Incidents (par mois) : nombre d'incidents techniques ou réclamations déclarés par le client.\\\\nPour illustrer l'application de l'ACP sur un jeu de données télécoms réaliste, on s'intéresse à un échantillon composé de 8 clients ayant un abonnement de type postpayé. Les données caractéristiques sont fournies dans la table 4.",
+            "question_text": "En tenant compte de la diversité des variables utilisées par les opérateurs télécoms, expliquez pourquoi centrer simplement les variables ne suffit pas dans ce cas, et pourquoi l'on préfère généralement une standardisation complète avant l'ACP.",
+            "max_score": 1.0,
+            "criteria": [
+                {
+                    "condition": "Les échelles sont très différentes : Mo, minutes, TND, mois, score sur 10, incidents. Sans réduction, les variables à forte variance (Data_Usage, Voice_Minutes) domineraient artificiellement les premières composantes. La standardisation met toutes les variables sur le même pied (variance = 1), rendant l'ACP sensible aux corrélations plutôt qu'aux unités.",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_PARTIE_I_Q1.4",
+            "context": "Un opérateur mobile souhaite analyser le données relatives à ses clients en se basant sur les six variables suivantes :\\\n1. Data_Usage (Mo/mois) : volume total de données mobiles consommées par le client chaque mois.\\\n2. Voice_Minutes (min/mois) : nombre total de minutes d'appel consommées par le client chaque mois.\\\n3. Montant_Facture (TND) : montant mensuel payé par le client, incluant l'abonnement et les éventuelles options.\\\n4. Ancienneté (mois) : durée depuis laquelle le client est abonné à l'opérateur.\\\n5. Satisfaction (/10) : score global de satisfaction fourni par le client.\\\n6. Incidents (par mois) : nombre d'incidents techniques ou réclamations déclarés par le client.\\\\nPour illustrer l'application de l'ACP sur un jeu de données télécoms réaliste, on s'intéresse à un échantillon composé de 8 clients ayant un abonnement de type postpayé. Les données caractéristiques sont fournies dans la table 4.",
+            "question_text": "Pourquoi l'ACP améliore-t-elle l'analyse statistique tout en rendant plus difficile l'interprétation métier (Télécom)?",
+            "max_score": 1.0,
+            "criteria": [
+                {
+                    "condition": "L'ACP donne des combinaisons linéaires des variables (PCs), optimales statistiquement. Mais ces nouvelles variables générées par l'ACP ne sont pas des variables métiers naturelles. Les équipes marketing préfèrent des indicateurs clairs (“Montant”, “Satisfaction”) plutôt qu'un axe abstrait/artificiel.",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_PARTIE_II_Q1.1",
+            "context": "On considère la matrice de covariance (standardisée) pour les trois variables [Data_Usage, Voice_Minutes, Montant_Facture] :",
+            "question_text": "À partir du tableau 4, écrire les formules matricielles (sans effectuer les calculs) qui permettent de construire la matrice de covariance Σ.",
+            "max_score": 1.0,
+            "criteria": [
+                {
+                    "condition": "Calcul du vecteur des moyennes : µ =(1743.75, 146.25, 26.75). Centrer la matrice des échantillons (dataframe initial) : X = X − μ. Calcul de la matrice de covariance S = 1/7 * XTX",
+                    "points": 1.0
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_PARTIE_II_Q1.2",
+            "context": "On considère la matrice de covariance (standardisée) pour les trois variables [Data_Usage, Voice_Minutes, Montant_Facture] :",
+            "question_text": "Interprétez les valeurs de la matrice de corrélation.",
+            "max_score": 0.5,
+            "criteria": [
+                {
+                    "condition": "Les corrélations sont très élevées (~0.99), ceci indique que les trois variables partagent un axe dominant en ACP.",
+                    "points": 0.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_PARTIE_II_Q1.3",
+            "context": "On considère la matrice de covariance (standardisée) pour les trois variables [Data_Usage, Voice_Minutes, Montant_Facture] :",
+            "question_text": "À partir des valeurs propres déjà obtenues, en déduire la troisième valeur propre.",
+            "max_score": 0.5,
+            "criteria": [
+                {
+                    "condition": "La somme des valeurs propres = trace(Σ) = 3, d'où λ =3 – (2.21+0.09) = 2.7",
+                    "points": 0.5
+                }
+            ]
+        },
+        {
+            "question_id": "Ex3_PARTIE_II_Q1.4",
+            "context": "On considère la matrice de covariance (standardisée) pour les trois variables [Data_Usage, Voice_Minutes, Montant_Facture] :",
+            "question_text": "Calculer la proportion de variance expliquée par chaque composante (en %). En déduire le nombre de dimensions à retenir pour effectuer la réduction dimensionnelle.",
+            "max_score": 2.0,
+            "criteria": [
+                {
+                    "condition": "PC1: 0.21/3.0 = 0.07 → 7% (arrondi 7.0%). PC2: 0.09/3.0 = 0.03 → 3% (≈ 3.1%). PC3: 2.7/3.0 = 0.9 → 90%. Après PC1: 7%. Après PC1+PC2 : 7% + 3% = 10%. PC1 capture ~90% de la variance, on peut raisonnablement réduire à 1 dimension pour ces 3 variables.",
+                    "points": 2.0
+                }
+            ]
+        }
+    ]
+}

@@ -33,7 +33,7 @@ print(f"⚙️ Initialisation de Vertex AI pour le projet {PROJECT_ID}...")
 
 # Le SDK unifié va automatiquement chercher tes identifiants locaux (ADC)
 # Plus besoin de popup !
-client = genai.Client(
+client = genai.Client(  #authenticate  a connection with the Vertex AI API using the genai SDK to create a client obejct that will be used with gemini calls  
     vertexai=True,
     project=PROJECT_ID,
     location=LOCATION
@@ -144,7 +144,7 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
     completed_grades = {}
     note_globale = 0.0
     total_questions = len(master_rubric)
-    
+
     print(f"\n🚀 STARTING AI GRADING ({total_questions} questions)")
     print(f"🤖 Correction model: {MODEL_ID}")
     print("-" * 50)
@@ -154,7 +154,7 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
         q_id = rubric_item.get("question_id")
         max_score = rubric_item.get("max_score", 0)
 
-        if q_id not in student_answers:
+        if q_id not in student_answers:  #skip grading if no answer provided
             return i, q_id, None
 
         student_ans = student_answers[q_id]
@@ -190,7 +190,13 @@ def grade_exam(master_rubric, student_answers, progress_callback=None):
             }
 
     with ThreadPoolExecutor(max_workers=min(total_questions, 5)) as executor:
-        futures = {executor.submit(grade_single, (i, item)): i for i, item in enumerate(master_rubric)}
+        futures = {
+            executor.submit(
+                grade_single,
+                (i, item)
+            ): i
+            for i, item in enumerate(master_rubric)
+        }
         completed_questions = 0
         for future in as_completed(futures):
             i, q_id, result = future.result()

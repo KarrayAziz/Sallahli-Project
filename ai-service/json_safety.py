@@ -8,6 +8,10 @@ _HEX_DIGITS = set("0123456789abcdefABCDEF")
 
 
 def _strip_json_fences(raw_text):
+    # """
+    # input : ```json {"a": 1} ```
+    # output: {"a": 1}
+    # """
     text = raw_text.strip()
     if text.startswith("```"):
         text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
@@ -16,14 +20,27 @@ def _strip_json_fences(raw_text):
 
 
 def _escape_invalid_backslashes(raw_text):
+    # """
+    # input : \x  
+    # ouput : \\x
+    # """
     return _VALID_JSON_ESCAPE_RE.sub(r"\\\\", raw_text)
 
 
 def _escape_latex_command_backslashes(raw_text):
+    # """
+    # input : \textbf{hello}  
+    # ouput : \\textbf{hello}
+    # """
     return _LATEX_COMMAND_ESCAPE_RE.sub(r"\\\\", raw_text)
 
 
 def _repair_backslashes_inside_json_strings(raw_text):
+#     """
+#     ✔ Valid JSON escapes stay intact : v\n \" \u1234
+#     ✔ Invalid escapes are fixed : \q → \\q
+#     ✔ LaTeX is preserved safely : \alpha → \\alpha
+#     """
     result = []
     in_string = False
     i = 0
@@ -93,3 +110,26 @@ def safe_json_loads(raw_text, context="model output"):
             print(f"[JSON] Original parse error: {original_error}", flush=True)
             print(f"[JSON] Raw preview: {preview}", flush=True)
             raise repaired_error
+        
+
+test_input = r'''
+{
+  "question": "Solve this equation: \alpha + \beta = 5",
+  "hint": "Use formula \frac{a}{b} and remember \n is newline",
+  "bad_escape": "This is invalid: \q \x \y",
+  "unicode_test": "Smile: \u263A and broken: \u12GZ",
+  "mixed": "Math: \alpha \beta \gamma and quote: \"hello\""
+}
+'''
+
+if main := __name__ == "__main__":
+    print(safe_json_loads(test_input))
+
+#output : 
+# {
+#   "question": "Solve this equation: \\alpha + \\beta = 5",
+#   "hint": "Use formula \\frac{a}{b} and remember \n is newline",
+#   "bad_escape": "This is invalid: \\q \\x \\y",
+#   "unicode_test": "Smile: \u263A and broken: \\u12GZ",
+#   "mixed": "Math: \\alpha \\beta \\gamma and quote: \\"hello\""
+# }
